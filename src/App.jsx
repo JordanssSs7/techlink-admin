@@ -1,11 +1,11 @@
-import { usuarios, registrosSemanales, postulaciones, cursos, mentores } from './datos'
+import { usuarios, registrosSemanales, postulaciones, mentores } from './datos'
 import Sidebar from './components/Sidebar'
 import Tarjeta from './components/Tarjeta'
 import KpiCard from './components/KpiCard'
 import GraficoBarras from './components/GraficoBarras'
 import UsuarioLista from './components/UsuarioLista'
 import PostulacionLista from './components/PostulacionLista'
-import CursoLista from './components/CursoLista'
+import PanelCursos from './components/PanelCursos'
 import MentorCard from './components/MentorCard'
 import MetricasSesiones from './components/MetricasSesiones'
 
@@ -43,8 +43,8 @@ function App() {
           <PostulacionLista postulaciones={postulaciones} />
         </Tarjeta>
 
-        <Tarjeta id="cursos" titulo="Cursos críticos" descripcion="Registra cursos y aplica borrado lógico.">
-          <CursoLista cursos={cursos} />
+        <Tarjeta id="cursos" titulo="Cursos críticos" descripcion="Registra, busca, inactiva o elimina los cursos del plan de estudios.">
+          <PanelCursos />
         </Tarjeta>
 
         <Tarjeta id="mentorias" titulo="Mentorías por mentor" descripcion="Cada mentor con sus sesiones y horas impartidas.">

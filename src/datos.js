@@ -31,12 +31,15 @@ export const postulaciones = [
   { id: 3, postulante: 'Marco Vilca Pinto', ciclo: 4, cursos_aprobados: ['Programación I', 'Redes'], comprobante: 'notas_marco.pdf' },
 ]
 
-// HU-49: cursos críticos del plan de estudios
+// HU-49: cursos críticos del plan de estudios.
+// total_mentorias: sesiones asociadas; si es mayor que 0 el curso solo se puede inactivar.
 export const cursos = [
-  { id: 1, codigo: 'PRG101', nombre: 'Programación I', ciclo: 1, creditos: 4, activo: true },
-  { id: 2, codigo: 'MAT101', nombre: 'Cálculo I', ciclo: 1, creditos: 4, activo: true },
-  { id: 3, codigo: 'BDD201', nombre: 'Base de Datos', ciclo: 3, creditos: 4, activo: true },
-  { id: 4, codigo: 'FIS101', nombre: 'Física', ciclo: 2, creditos: 3, activo: false },
+  { id: 1, codigo: 'PRG101', nombre: 'Programación I', ciclo: 1, creditos: 4, activo: true, total_mentorias: 3 },
+  { id: 2, codigo: 'MAT101', nombre: 'Cálculo I', ciclo: 1, creditos: 4, activo: true, total_mentorias: 1 },
+  { id: 3, codigo: 'BDD201', nombre: 'Base de Datos', ciclo: 3, creditos: 4, activo: true, total_mentorias: 2 },
+  { id: 4, codigo: 'FIS101', nombre: 'Física', ciclo: 2, creditos: 3, activo: false, total_mentorias: 1 },
+  { id: 5, codigo: 'EST201', nombre: 'Estadística', ciclo: 3, creditos: 3, activo: true, total_mentorias: 0 },
+  { id: 6, codigo: 'RED301', nombre: 'Redes de Computadoras', ciclo: 4, creditos: 3, activo: false, total_mentorias: 0 },
 ]
 
 // HU-50: mentores con sus sesiones (relación 1:N)

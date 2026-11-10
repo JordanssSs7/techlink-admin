@@ -27,7 +27,7 @@ function Sidebar() {
           </a>
         ))}
       </nav>
-      <p className="sidebar-pie">Datos de prueba · Lab 10</p>
+      <p className="sidebar-pie">Datos de prueba · Lab 11</p>
     </aside>
   )
 }
