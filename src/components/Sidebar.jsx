@@ -27,7 +27,7 @@ function Sidebar() {
           </a>
         ))}
       </nav>
-      <p className="sidebar-pie">Cursos desde la API · Lab 12</p>
+      <p className="sidebar-pie">Datos de la base compartida</p>
     </aside>
   )
 }

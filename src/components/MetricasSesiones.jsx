@@ -1,30 +1,37 @@
+// Métricas del servicio calculadas por la API a partir de la tabla de sesiones.
 function MetricasSesiones({ sesiones }) {
-  const completadas = sesiones.filter((s) => s.estado === 'Completada')
-  const canceladas = sesiones.length - completadas.length
-  const horas = completadas.reduce((suma, s) => suma + s.duracion_horas, 0)
-  const promedio = completadas.reduce((suma, s) => suma + s.calificacion, 0) / completadas.length
-  const porcentaje = Math.round((completadas.length / sesiones.length) * 100)
+  if (!sesiones) {
+    return (
+      <p className="vacio">
+        Las métricas de sesiones aparecerán cuando exista la tabla de sesiones (migración V6 del backend de usuario).
+      </p>
+    )
+  }
+  if (sesiones.total === 0) {
+    return <p className="vacio">Todavía no se ha agendado ninguna sesión.</p>
+  }
+
+  const porcentaje = Math.round((sesiones.confirmadas / sesiones.total) * 100)
 
   return (
     <div className="metricas">
       <div className="metrica">
-        <p className="kpi-titulo">Sesiones completadas vs canceladas</p>
+        <p className="kpi-titulo">Sesiones confirmadas vs canceladas</p>
         <div className="progreso">
           <div className="progreso-ok" style={{ width: `${porcentaje}%` }} />
         </div>
         <p className="texto-suave">
-          {completadas.length} completadas · {canceladas} canceladas ({porcentaje}% de éxito)
+          {sesiones.confirmadas} confirmadas · {sesiones.canceladas} canceladas ({porcentaje}% confirmadas)
         </p>
       </div>
       <div className="metrica">
-        <p className="kpi-titulo">Horas impartidas</p>
-        <p className="metrica-valor">{horas} h</p>
+        <p className="kpi-titulo">Horas de mentoría</p>
+        <p className="metrica-valor">{sesiones.horas_confirmadas} h</p>
+        <p className="texto-suave">{sesiones.proximas} sesiones próximas</p>
       </div>
       <div className="metrica">
-        <p className="kpi-titulo">Calificación promedio</p>
-        <p className="metrica-valor">
-          {promedio.toFixed(1)} <span className="estrellas">★</span>
-        </p>
+        <p className="kpi-titulo">Estudiantes atendidos</p>
+        <p className="metrica-valor">{sesiones.estudiantes_atendidos}</p>
       </div>
     </div>
   )

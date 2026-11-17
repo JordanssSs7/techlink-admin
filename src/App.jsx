@@ -1,19 +1,20 @@
-import { usuarios, registrosSemanales, postulaciones, mentores } from './datos'
+import { postulaciones } from './datos'
+import useApi from './hooks/useApi'
 import Sidebar from './components/Sidebar'
 import Tarjeta from './components/Tarjeta'
 import KpiCard from './components/KpiCard'
 import GraficoBarras from './components/GraficoBarras'
+import EstadoCarga from './components/EstadoCarga'
 import UsuarioLista from './components/UsuarioLista'
 import PostulacionLista from './components/PostulacionLista'
 import PanelCursos from './components/PanelCursos'
-import MentorCard from './components/MentorCard'
+import PanelMentorias from './components/PanelMentorias'
 import MetricasSesiones from './components/MetricasSesiones'
 
 function App() {
-  const estudiantes = usuarios.filter((u) => u.rol === 'Estudiante').length
-  const mentoresActivos = usuarios.filter((u) => u.rol === 'Mentor' && u.activo).length
-  const registrosMes = registrosSemanales.slice(-4).reduce((suma, s) => suma + s.total, 0)
-  const todasSesiones = mentores.flatMap((m) => m.sesiones)
+  // Los indicadores, el gráfico y las métricas salen de un solo endpoint de la API.
+  const { datos: resumen, cargando, error, recargar } = useApi('/metricas/resumen/')
+  const valor = (campo) => (resumen ? resumen[campo] : '—')
 
   return (
     <div className="app">
@@ -25,21 +26,26 @@ function App() {
         </header>
 
         <section id="resumen" className="kpis">
-          <KpiCard titulo="Estudiantes inscritos" valor={estudiantes} detalle="Cuentas de estudiantes" icono="usuarios" />
-          <KpiCard titulo="Mentores activos" valor={mentoresActivos} detalle="Acreditados y activos" icono="estrella" color="verde" />
-          <KpiCard titulo="Registros del mes" valor={registrosMes} detalle="Últimas 4 semanas" icono="grafico" color="ambar" />
-          <KpiCard titulo="Postulaciones" valor={postulaciones.length} detalle="En revisión" icono="archivo" color="rojo" />
+          <KpiCard titulo="Estudiantes" valor={valor('estudiantes')} detalle="Cuentas de estudiantes" icono="usuarios" />
+          <KpiCard titulo="Mentores activos" valor={valor('mentores_activos')} detalle="Con cuenta activa" icono="estrella" color="verde" />
+          <KpiCard titulo="Registros del mes" valor={valor('registros_ultimas_4_semanas')} detalle="Últimas 4 semanas" icono="grafico" color="ambar" />
+          <KpiCard titulo="Cursos activos" valor={valor('cursos_activos')} detalle="En el catálogo" icono="libro" color="rojo" />
         </section>
 
-        <Tarjeta titulo="Crecimiento de registros" descripcion="Nuevos usuarios registrados por semana.">
-          <GraficoBarras datos={registrosSemanales} />
+        <Tarjeta titulo="Crecimiento de registros" descripcion="Nuevos usuarios registrados por semana (lunes de cada semana).">
+          <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
+          {resumen && <GraficoBarras datos={resumen.registros_semanales} />}
         </Tarjeta>
 
-        <Tarjeta id="usuarios" titulo="Usuarios y roles" descripcion="Busca, cambia el rol, activa o desactiva cuentas.">
-          <UsuarioLista usuarios={usuarios} />
+        <Tarjeta id="usuarios" titulo="Usuarios y roles" descripcion="Busca, cambia el rol, activa o desactiva cuentas de la base compartida.">
+          <UsuarioLista />
         </Tarjeta>
 
-        <Tarjeta id="postulaciones" titulo="Postulaciones a mentor" descripcion="Evalúa los comprobantes y aprueba o rechaza con motivo.">
+        <Tarjeta
+          id="postulaciones"
+          titulo="Postulaciones a mentor"
+          descripcion="Datos de prueba: la tabla de postulaciones todavía no existe en la base compartida."
+        >
           <PostulacionLista postulaciones={postulaciones} />
         </Tarjeta>
 
@@ -47,16 +53,13 @@ function App() {
           <PanelCursos />
         </Tarjeta>
 
-        <Tarjeta id="mentorias" titulo="Mentorías por mentor" descripcion="Cada mentor con sus sesiones y horas impartidas.">
-          <div className="grid">
-            {mentores.map((m) => (
-              <MentorCard key={m.id} nombre={m.nombre} sesiones={m.sesiones} />
-            ))}
-          </div>
+        <Tarjeta id="mentorias" titulo="Mentorías por mentor" descripcion="Perfil de cada mentor con sus cursos, horarios y sesiones.">
+          <PanelMentorias />
         </Tarjeta>
 
         <Tarjeta id="metricas" titulo="Métricas del servicio" descripcion="Impacto global de las mentorías.">
-          <MetricasSesiones sesiones={todasSesiones} />
+          <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
+          {resumen && <MetricasSesiones sesiones={resumen.sesiones} />}
         </Tarjeta>
       </main>
     </div>

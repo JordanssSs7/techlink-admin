@@ -40,7 +40,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+    # Apps del negocio (una por módulo del panel de administración)
+    'core',
     'cursos',
+    'usuarios',
+    'postulaciones',
+    'mentorias',
 ]
 
 MIDDLEWARE = [
