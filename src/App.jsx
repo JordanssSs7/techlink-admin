@@ -43,7 +43,7 @@ function App() {
           <PostulacionLista postulaciones={postulaciones} />
         </Tarjeta>
 
-        <Tarjeta id="cursos" titulo="Cursos críticos" descripcion="Registra, busca, inactiva o elimina los cursos del plan de estudios.">
+        <Tarjeta id="cursos" titulo="Cursos" descripcion="Catálogo de cursos de la carrera, cargado desde la API de Django.">
           <PanelCursos />
         </Tarjeta>
 

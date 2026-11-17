@@ -4,7 +4,7 @@ const ENLACES = [
   { href: '#resumen', texto: 'Resumen', icono: 'inicio' },
   { href: '#usuarios', texto: 'Usuarios y roles', icono: 'usuarios' },
   { href: '#postulaciones', texto: 'Postulaciones', icono: 'archivo' },
-  { href: '#cursos', texto: 'Cursos críticos', icono: 'libro' },
+  { href: '#cursos', texto: 'Cursos', icono: 'libro' },
   { href: '#mentorias', texto: 'Mentorías', icono: 'reloj' },
   { href: '#metricas', texto: 'Métricas', icono: 'grafico' },
 ]
@@ -27,7 +27,7 @@ function Sidebar() {
           </a>
         ))}
       </nav>
-      <p className="sidebar-pie">Datos de prueba · Lab 11</p>
+      <p className="sidebar-pie">Cursos desde la API · Lab 12</p>
     </aside>
   )
 }

@@ -129,7 +129,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--p
 .campo { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--suave); }
 .barra-filtros { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
 .barra-filtros input[type='search'] { flex: 1; min-width: 220px; }
-.form-curso { display: grid; grid-template-columns: 1.2fr 2fr .8fr .8fr auto; gap: 10px; margin-bottom: 10px; }
+.form-curso { display: grid; grid-template-columns: 1fr 150px auto auto; gap: 10px; margin-bottom: 10px; }
 .form-curso input { min-width: 0; width: 100%; }
 .acciones { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .btn { font: inherit; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: filter .15s, background .15s; }
@@ -150,6 +150,7 @@ th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacin
 td { padding: 12px; border-bottom: 1px solid var(--borde); }
 tr:last-child td { border-bottom: 0; }
 .fila-inactiva td { color: #94a3b8; }
+td .acciones { flex-wrap: nowrap; white-space: nowrap; }
 .nota { margin-top: 12px; }
 
 /* Mentorías */
@@ -164,7 +165,10 @@ tr:last-child td { border-bottom: 0; }
 .metrica-valor { font-size: 32px; font-weight: 700; }
 .resumen-cursos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 18px; }
 .resumen-cursos .metrica-valor { font-size: 26px; }
+.error-carga { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; }
+.editando { margin-bottom: 8px; }
 .aviso { background: #eef2ff; color: var(--primario-oscuro); border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.aviso-error { background: #fee2e2; color: #991b1b; }
 .progreso { height: 12px; border-radius: 999px; background: #fee2e2; overflow: hidden; }
 .progreso-ok { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 999px; }
 
