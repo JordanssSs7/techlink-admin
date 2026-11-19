@@ -55,6 +55,9 @@ class Mentor(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, db_column='id_usuario', related_name='mentor')
     especialidad = models.CharField(max_length=150, null=True)
     biografia = models.TextField(null=True)
+    # Reputación ya calculada por el backend de usuario (V7): promedio de estrellas y cantidad de calificaciones.
+    reputacion = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    total_calificaciones = models.IntegerField(default=0)
 
     class Meta:
         managed = False

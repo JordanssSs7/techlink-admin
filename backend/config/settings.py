@@ -152,8 +152,21 @@ MAILERS = {
     },
 }
 
+# Avisos del panel (por ejemplo, al cancelar una sesión). En desarrollo los correos se imprimen en la consola de
+# Django; para enviarlos de verdad se define EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend y los datos SMTP.
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '') == '1'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'TechLink <no-responder@techlink.local>')
+
 # El panel de React (Vite) corre en otro puerto durante el desarrollo.
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    # El panel usa el puerto 5174 porque el 5173 es de la aplicación de usuario.
+    'http://localhost:5174',
+    'http://127.0.0.1:5174',
 ]
