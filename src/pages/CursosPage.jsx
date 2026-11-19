@@ -1,8 +1,21 @@
-// Pantalla /cursos — Catálogo de cursos (ya conectado a la API en la Semana 12 con PanelCursos).
-// API: /api/cursos/
-// Estructura inicial (Semana 13): la pantalla se completa en las siguientes semanas.
+import EncabezadoPagina from '../components/EncabezadoPagina'
+import PanelCursos from '../components/PanelCursos'
+import Tarjeta from '../components/Tarjeta'
+
+// Pantalla /cursos — Catálogo de cursos conectado a la API (PanelCursos, /api/cursos/).
 function CursosPage() {
-  return null
+  return (
+    <>
+      <EncabezadoPagina
+        etiqueta="Catálogo"
+        titulo="Cursos"
+        intro="Registra, edita, inactiva o elimina los cursos de la carrera."
+      />
+      <Tarjeta>
+        <PanelCursos />
+      </Tarjeta>
+    </>
+  )
 }
 
 export default CursosPage
