@@ -1,6 +1,7 @@
 from rest_framework import mixins, viewsets
 
 from .models import Usuario
+from .pagination import UsuarioPagination
 from .serializers import UsuarioSerializer
 
 
@@ -9,9 +10,11 @@ class UsuarioViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
     """Usuarios de TechLink: listar, ver y cambiar el rol o el estado con PATCH.
 
     Filtros: ?search=texto (nombres, apellidos o correo), ?rol=ESTUDIANTE|MENTOR|ADMIN y ?estado=ACTIVO|INACTIVO.
+    Paginación (HU-45): ?page=1&page_size=12. La respuesta es {count, next, previous, results}.
     """
 
     serializer_class = UsuarioSerializer
+    pagination_class = UsuarioPagination
     http_method_names = ['get', 'patch', 'head', 'options']
     filterset_fields = ['estado']
     search_fields = ['nombres', 'apellidos', 'correo']
