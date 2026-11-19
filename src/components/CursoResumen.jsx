@@ -1,4 +1,5 @@
 // Resumen, hermano del listado: todo se calcula con los cursos recibidos de la API, sin useState.
+// PROPS RECIBIDOS: solo cursos; los totales de abajo son datos derivados y se recalculan en cada render.
 function CursoResumen({ cursos }) {
   const activos = cursos.filter((c) => c.activo).length
   const inactivos = cursos.length - activos

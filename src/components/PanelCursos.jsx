@@ -22,6 +22,7 @@ function mensajeDeError(err, porDefecto) {
 // Pide los cursos a la API de Django y guarda el estado que comparten sus hijos:
 // los datos bajan por props y los avisos suben por las funciones que este componente entrega.
 function PanelCursos() {
+  // ESTADO: el padre es el único dueño de los datos; los hijos solo los reciben por props.
   const [cursos, setCursos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -72,6 +73,7 @@ function PanelCursos() {
   }, [aviso])
 
   // POST (alta) o PATCH (edición). Devuelve true si se guardó, para que el formulario se limpie.
+  // AVISO QUE SUBE: CursoForm llama a esta función por la prop onGuardar.
   async function guardarCurso(datos) {
     setErrorFormulario('')
     try {
@@ -93,6 +95,7 @@ function PanelCursos() {
   }
 
   // PATCH de un solo campo: activa o inactiva el curso (borrado lógico).
+  // AVISO QUE SUBE: CursoFila la llama por la prop onCambiarEstado (pasa por CursoLista).
   async function cambiarEstado(curso) {
     try {
       const respuesta = await api.patch(`/cursos/${curso.id}/`, { activo: !curso.activo })
@@ -105,6 +108,7 @@ function PanelCursos() {
 
   // DELETE: la fila ya pidió la confirmación. Con 204 se quita del estado;
   // con 404 el curso ya no existía en el servidor y también se quita de la lista.
+  // AVISO QUE SUBE: CursoFila la llama por la prop onEliminar (pasa por CursoLista).
   async function eliminarCurso(curso) {
     try {
       await api.delete(`/cursos/${curso.id}/`)
@@ -133,6 +137,7 @@ function PanelCursos() {
 
   const hayFiltros = busqueda.trim() !== '' || filtroActivo !== ''
 
+  // PROPS: aquí el padre reparte datos (cursos=...) y funciones (onGuardar=...) a cada hijo.
   return (
     <>
       <CursoResumen cursos={cursos} />
