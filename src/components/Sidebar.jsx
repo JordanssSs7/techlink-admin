@@ -1,33 +1,82 @@
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../auth/authContext'
+import { borrarSesion } from '../auth/sesion'
+import { URL_SALIDA } from '../config'
 import Icono from './Icono'
 
 const ENLACES = [
-  { href: '#resumen', texto: 'Resumen', icono: 'inicio' },
-  { href: '#usuarios', texto: 'Usuarios y roles', icono: 'usuarios' },
-  { href: '#postulaciones', texto: 'Postulaciones', icono: 'archivo' },
-  { href: '#cursos', texto: 'Cursos', icono: 'libro' },
-  { href: '#mentorias', texto: 'Mentorías', icono: 'reloj' },
-  { href: '#metricas', texto: 'Métricas', icono: 'grafico' },
+  { ruta: '/', texto: 'Resumen', icono: 'inicio' },
+  { ruta: '/usuarios', texto: 'Usuarios y roles', icono: 'usuarios' },
+  { ruta: '/postulaciones', texto: 'Postulaciones', icono: 'archivo' },
+  { ruta: '/cursos', texto: 'Cursos', icono: 'libro' },
+  { ruta: '/mentorias', texto: 'Mentorías', icono: 'estrella' },
+  { ruta: '/sesiones', texto: 'Sesiones', icono: 'reloj' },
+  { ruta: '/metricas', texto: 'Métricas', icono: 'grafico' },
 ]
 
-function Sidebar() {
+function iniciales(usuario) {
+  return `${usuario.nombres ?? ''} ${usuario.apellidos ?? ''}`
+    .split(' ')
+    .filter((p) => p && p !== '-')
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase()
+}
+
+// Menú lateral: cada opción abre su propia pantalla. En pantallas pequeñas se abre y se cierra desde la barra superior.
+function Sidebar({ abierto, onCerrar }) {
+  const { usuario } = useAuth()
+  const nombre = `${usuario.nombres} ${usuario.apellidos && usuario.apellidos !== '-' ? usuario.apellidos : ''}`.trim()
+
+  // Cierra la sesión del panel y vuelve al inicio de sesión de la aplicación de usuario (que cierra la suya).
+  // Se borra directo del almacenamiento y no con logout(): así el router no cambia de ruta a /login y cancela la salida.
+  function salir() {
+    borrarSesion()
+    window.location.assign(URL_SALIDA)
+  }
+
   return (
-    <aside className="sidebar">
+    <aside className={abierto ? 'sidebar abierto' : 'sidebar'}>
       <div className="logo">
-        <span className="logo-marca">TL</span>
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 3h8l-3 9H3z" fill="currentColor" />
+          <path d="M13 3h8v9h-5l-3 9H9z" fill="currentColor" />
+        </svg>
         <div>
           <strong>TechLink</strong>
-          <small>Panel de administración</small>
+          <small>Administración</small>
         </div>
       </div>
-      <nav>
+
+      <nav aria-label="Secciones del panel">
+        <p className="nav-titulo">Menú</p>
         {ENLACES.map((e) => (
-          <a key={e.href} href={e.href}>
+          <NavLink
+            key={e.ruta}
+            to={e.ruta}
+            end={e.ruta === '/'}
+            className={({ isActive }) => (isActive ? 'enlace activo' : 'enlace')}
+            onClick={onCerrar}
+          >
             <Icono nombre={e.icono} tam={18} />
             {e.texto}
-          </a>
+          </NavLink>
         ))}
       </nav>
-      <p className="sidebar-pie">Datos de la base compartida</p>
+
+      <div className="sidebar-usuario">
+        <div className="sidebar-usuario-fila">
+          <span className="sidebar-avatar">{iniciales(usuario)}</span>
+          <div className="sidebar-usuario-texto">
+            <p className="sidebar-usuario-nombre">{nombre}</p>
+            <p className="sidebar-usuario-dato">Administrador</p>
+          </div>
+        </div>
+        <button type="button" className="sidebar-salir" onClick={salir}>
+          Cerrar sesión
+        </button>
+      </div>
     </aside>
   )
 }

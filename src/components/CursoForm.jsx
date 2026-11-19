@@ -3,6 +3,7 @@ import { useState } from 'react'
 // Formulario de alta y de edición. Si recibe cursoEditando, se llena con sus datos
 // (el padre cambia la key para reiniciarlo). Las reglas del nombre las valida la API:
 // aquí solo se comprueba que no esté vacío y se muestra el error 400 que devuelve Django.
+// PROPS RECIBIDOS: datos del padre (cursoEditando, errorServidor) y funciones para avisarle (onGuardar, onCancelar).
 function CursoForm({ cursoEditando, errorServidor, onGuardar, onCancelar }) {
   const [nombre, setNombre] = useState(cursoEditando ? cursoEditando.nombre : '')
   const [activo, setActivo] = useState(cursoEditando ? cursoEditando.activo : true)
@@ -17,6 +18,7 @@ function CursoForm({ cursoEditando, errorServidor, onGuardar, onCancelar }) {
     }
     setError('')
     setEnviando(true)
+    // AVISO AL PADRE: envía el registro nuevo con onGuardar; el padre hace el POST o PATCH.
     const guardado = await onGuardar({ nombre, activo })
     setEnviando(false)
     if (guardado && !cursoEditando) {

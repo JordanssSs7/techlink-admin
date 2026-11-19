@@ -2,7 +2,8 @@
 
 Panel de administración de TechLink: front-end en React + Vite y back-end en Django REST Framework.
 Django usa la **misma base de datos MySQL (`techlink`)** que el backend de usuario (Spring Boot).
-Todas las secciones consumen la API, salvo postulaciones, que todavía usa datos de prueba (`src/datos.js`).
+Todas las secciones consumen la API de Django: usuarios (con paginación), postulaciones, cursos, mentorías, sesiones y métricas.
+Las tablas de postulaciones, calificaciones y sesiones las crean las migraciones V6 a V8 del backend de usuario (Spring Boot).
 
 ## Ejecutar Django y React a la vez
 
@@ -18,14 +19,40 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 
-**Terminal 2 – React (puerto 5173)**
+**Terminal 2 – React (puerto 5174)**
 
 ```
 npm install
 npm run dev
 ```
 
-Abrir http://localhost:5173/
+Abrir http://localhost:5174/ (el puerto 5173 es de la aplicación de usuario).
+
+### Inicio de sesión del administrador
+
+El administrador inicia sesión **en la aplicación de usuario** (http://localhost:5173, el mismo login de todos) y, al entrar, pasa directo a este panel:
+la aplicación de usuario le pasa la sesión en el fragmento de la URL (`#sesion=...`), el panel la guarda en `sessionStorage` y borra el fragmento.
+Al pulsar "Cerrar sesión" en el panel se vuelve a la aplicación de usuario con `/?salir`, que también cierra su sesión.
+Las direcciones se pueden cambiar con `VITE_ADMIN_URL` (en la aplicación de usuario) y `VITE_USER_URL` (en el panel).
+
+Si alguien abre el panel directamente, `/login` también pide correo y contraseña (mismo diseño). La cuenta se valida en el backend de usuario
+(Spring Boot, `POST /api/auth/login`), por eso **Spring Boot debe estar encendido en el puerto 8080**. Solo las cuentas con rol `ADMIN` entran;
+estudiantes y mentores ingresan desde la aplicación de TechLink. En desarrollo, Vite reenvía `/spring` hacia `http://localhost:8080`
+(`vite.config.js`), así no hace falta CORS en Spring; en otro entorno se define `VITE_AUTH_URL`.
+El token se guarda en `sessionStorage` y Axios lo envía en cada petición (`Authorization: Bearer ...`). Django todavía **no lo valida** (RNF-02 pendiente).
+
+### Pantallas (una por opción del menú)
+
+| Ruta | Pantalla |
+|---|---|
+| `/login` | Inicio de sesión del administrador |
+| `/` | Resumen: indicadores y crecimiento de registros |
+| `/usuarios` | Usuarios y roles (paginado) |
+| `/postulaciones` | Postulaciones a mentor |
+| `/cursos` | Catálogo de cursos |
+| `/mentorias` | Mentorías por mentor |
+| `/sesiones` | Sesiones y cancelación |
+| `/metricas` | Métricas y exportación del reporte |
 
 Notas del backend:
 
@@ -35,9 +62,9 @@ Notas del backend:
 
 ## CORS
 
-React (http://localhost:5173) y Django (http://127.0.0.1:8000) son orígenes distintos, por eso se usa `django-cors-headers`:
+React (http://localhost:5174) y Django (http://127.0.0.1:8000) son orígenes distintos, por eso se usa `django-cors-headers`:
 `corsheaders` en `INSTALLED_APPS`, `corsheaders.middleware.CorsMiddleware` en la parte alta de `MIDDLEWARE` y
-`CORS_ALLOWED_ORIGINS` con `http://localhost:5173` y `http://127.0.0.1:5173` (`backend/config/settings.py`).
+`CORS_ALLOWED_ORIGINS` con los puertos 5173 y 5174 de `localhost` y `127.0.0.1` (`backend/config/settings.py`).
 
 ## Endpoints que usa el panel
 
@@ -50,14 +77,27 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Editar o inactivar | `PATCH /api/cursos/{id}/` | 200, 400 o 404 |
 | Eliminar | `DELETE /api/cursos/{id}/` | 204, 404 si ya no existe, 400 si lo usa algún mentor o estudiante |
 
-| Listar usuarios | `GET /api/usuarios/?search=texto&rol=MENTOR&estado=ACTIVO` | 200 |
+| Listar usuarios (HU-45) | `GET /api/usuarios/?search=texto&rol=MENTOR&estado=ACTIVO&page=1&page_size=12` | 200 con `{count, next, previous, results}` |
 | Cambiar rol o estado | `PATCH /api/usuarios/{id}/` | 200, o 400 si deja el panel sin administrador activo o hace administradora a una cuenta de Google |
+| Listar postulaciones (HU-48) | `GET /api/postulaciones/?estado=EN_REVISION&search=texto` | 200 |
+| Ver el comprobante | `GET /api/postulaciones/{id}/comprobante/` | 200 con el PDF o la imagen, o 404 |
+| Aprobar | `POST /api/postulaciones/{id}/aprobar/` | 200 (el usuario pasa a MENTOR y se crea su fila en `mentores`), 409 si ya fue evaluada |
+| Rechazar | `POST /api/postulaciones/{id}/rechazar/` con `{"motivo": "..."}` | 200, 400 si falta el motivo, 409 si ya fue evaluada |
+| Listar sesiones (HU-51) | `GET /api/sesiones/?estado=PROGRAMADA&desde=2026-11-01&hasta=2026-11-30&search=texto&page=1` | 200 con `{count, next, previous, results}`, o 400 si una fecha es inválida |
+| Cancelar una sesión | `POST /api/sesiones/{id}/cancelar/` con `{"motivo": "..."}` | 200 (avisa por correo al estudiante y al mentor), 400 sin motivo, 409 si ya fue cancelada o ya terminó |
 | Mentores con perfil y sesiones | `GET /api/mentores/` | 200 |
-| Indicadores y métricas | `GET /api/metricas/resumen/` | 200 |
+| Indicadores y métricas (HU-47, HU-50) | `GET /api/metricas/resumen/` | 200 (incluye calificación promedio y distribución por estrellas) |
+| Exportar el reporte (HU-50) | `GET /api/metricas/exportar/?formato=xlsx` o `?formato=pdf` | 200 con el archivo, o 400 si el formato no existe |
 | Estado de la API | `GET /api/estado/` | 200 |
 
-La sección de postulaciones sigue con datos de prueba (`src/datos.js`) porque todavía no existe su tabla en la base compartida.
-Las sesiones se leen de la tabla `sesiones` (migración V6 del backend de usuario); si aún no existe en la base local, el panel lo indica.
+Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8).
+Si esas migraciones todavía no se aplicaron en la base local, hay que arrancar una vez el backend de usuario (Spring Boot) para que Flyway las cree.
+
+Estados de una sesión: la tabla solo guarda `CONFIRMADA` o `CANCELADA`; el panel muestra además **Programada** y **Completada**, según la fecha y la hora de fin.
+Los correos de aviso salen por la consola de Django en desarrollo; para enviarlos de verdad se define `EMAIL_BACKEND` y los datos SMTP (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`).
+
+Pendiente: el motivo de una cancelación solo viaja en el correo, porque la tabla `sesiones` no tiene una columna para guardarlo (haría falta una migración V9 en el backend de usuario).
+El campo `id_revisor` de una postulación queda vacío hasta que el panel tenga login.
 
 Campos de un curso: `id`, `nombre`, `activo`, `total_mentores` y `total_estudiantes` (los dos últimos son de solo lectura).
 

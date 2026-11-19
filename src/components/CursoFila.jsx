@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 // Fila: muestra el curso y avisa al padre. Su único estado es de interfaz:
 // si está esperando el segundo clic que confirma la eliminación.
+// PROPS RECIBIDOS: curso (dato, solo lectura) y tres funciones que sirven para avisar al padre.
 function CursoFila({ curso, onEditar, onCambiarEstado, onEliminar }) {
   const [confirmando, setConfirmando] = useState(false)
   const enUso = curso.total_mentores + curso.total_estudiantes > 0
@@ -18,6 +19,7 @@ function CursoFila({ curso, onEditar, onCambiarEstado, onEliminar }) {
         {confirmando ? (
           <div className="acciones">
             <span className="texto-suave">¿Eliminar este curso?</span>
+            {/* AVISO AL PADRE: la fila no borra nada, solo ejecuta onEliminar y le envía el curso. */}
             <button className="btn btn-peligro" onClick={() => onEliminar(curso)}>
               Confirmar
             </button>

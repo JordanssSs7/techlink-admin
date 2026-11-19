@@ -9,17 +9,12 @@ from rest_framework.response import Response
 from cursos.models import Curso
 from usuarios.models import Mentor, Usuario
 
+from .metricas import horas, resumen_sesiones
 from .models import Sesion
 
 
 def hay_tabla_sesiones():
     return 'sesiones' in connection.introspection.table_names()
-
-
-def horas(sesion):
-    inicio = datetime.combine(date.min, sesion.hora_inicio)
-    fin = datetime.combine(date.min, sesion.hora_fin)
-    return round((fin - inicio).total_seconds() / 3600, 2)
 
 
 def agrupar_por_mentor(sql):
@@ -105,14 +100,6 @@ def resumen(request):
         'sesiones': None,
     }
     if datos['sesiones_disponibles']:
-        todas = list(Sesion.objects.all())
-        confirmadas = [s for s in todas if s.estado == 'CONFIRMADA']
-        datos['sesiones'] = {
-            'total': len(todas),
-            'confirmadas': len(confirmadas),
-            'canceladas': len(todas) - len(confirmadas),
-            'horas_confirmadas': round(sum(horas(s) for s in confirmadas), 2),
-            'proximas': sum(1 for s in confirmadas if s.fecha >= hoy),
-            'estudiantes_atendidos': len({s.estudiante_id for s in confirmadas}),
-        }
+        # HU-50: sesiones completadas, canceladas, horas y calificación promedio (tabla calificaciones, V7).
+        datos['sesiones'] = resumen_sesiones()
     return Response(datos)
