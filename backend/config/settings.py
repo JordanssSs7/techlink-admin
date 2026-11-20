@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'usuarios',
     'postulaciones',
     'mentorias',
+    'moderacion',
+    'auditoria',
 ]
 
 MIDDLEWARE = [
@@ -94,10 +96,13 @@ DATABASES = {
 # Django no crea tablas propias en la base compartida.
 MIGRATION_MODULES = {'auth': None, 'contenttypes': None}
 
+# Clave con la que Spring Boot firma los tokens JWT (la variable JWT_SECRET, la misma en los dos backends).
+# Con ella la API exige el token de un ADMIN; sin ella queda abierta (solo para desarrollo). Ver core/auth.py.
+JWT_SECRET = os.environ.get('JWT_SECRET', '')
+
 REST_FRAMEWORK = {
-    # La API todavía no tiene autenticación (pendiente: login del administrador).
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
+    'DEFAULT_AUTHENTICATION_CLASSES': ['core.auth.TokenSpringAuthentication'],
+    'DEFAULT_PERMISSION_CLASSES': ['core.auth.EsAdministrador'],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -170,3 +175,5 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5174',
     'http://127.0.0.1:5174',
 ]
+# El panel lee el nombre del archivo que se descarga (reporte de métricas) en este encabezado.
+CORS_EXPOSE_HEADERS = ['Content-Disposition']
