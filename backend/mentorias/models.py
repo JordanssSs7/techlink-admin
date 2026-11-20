@@ -12,6 +12,7 @@ class Sesion(models.Model):
     ESTADOS = [('CONFIRMADA', 'Confirmada'), ('CANCELADA', 'Cancelada')]
 
     id = models.AutoField(primary_key=True, db_column='id_sesion')
+    # Relaciones 1:N → un estudiante y un mentor pueden tener muchas sesiones.
     estudiante = models.ForeignKey(Estudiante, on_delete=models.PROTECT, db_column='id_estudiante')
     mentor = models.ForeignKey(Mentor, on_delete=models.PROTECT, db_column='id_mentor', related_name='sesiones')
     curso = models.ForeignKey(Curso, null=True, on_delete=models.PROTECT, db_column='id_curso', related_name='+')
