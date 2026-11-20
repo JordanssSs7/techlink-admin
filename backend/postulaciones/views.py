@@ -8,6 +8,8 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from auditoria.registro import registrar
+from core.auth import admin_id
 from usuarios.models import Mentor, Rol
 
 from .models import Postulacion, PostulacionArchivo
@@ -59,7 +61,10 @@ class PostulacionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
             postulacion.estado = 'APROBADA'
             postulacion.fecha_revision = timezone.now()
             postulacion.motivo_revision = None
-            postulacion.save(update_fields=['estado', 'fecha_revision', 'motivo_revision'])
+            postulacion.id_revisor = admin_id(request)
+            postulacion.save(update_fields=['estado', 'fecha_revision', 'motivo_revision', 'id_revisor'])
+            registrar(request, 'POSTULACION_APROBADA', 'postulacion', postulacion.id,
+                      f'Aprobó la postulación de {usuario.nombres} {usuario.apellidos} ({usuario.correo}); ahora es mentor')
         return Response(self.get_serializer(postulacion).data)
 
     @action(detail=True, methods=['post'])
@@ -74,7 +79,11 @@ class PostulacionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
             postulacion.estado = 'RECHAZADA'
             postulacion.fecha_revision = timezone.now()
             postulacion.motivo_revision = entrada.validated_data['motivo']
-            postulacion.save(update_fields=['estado', 'fecha_revision', 'motivo_revision'])
+            postulacion.id_revisor = admin_id(request)
+            postulacion.save(update_fields=['estado', 'fecha_revision', 'motivo_revision', 'id_revisor'])
+            usuario = postulacion.estudiante.usuario
+            registrar(request, 'POSTULACION_RECHAZADA', 'postulacion', postulacion.id,
+                      f'Rechazó la postulación de {usuario.nombres} {usuario.apellidos}: {postulacion.motivo_revision}')
         return Response(self.get_serializer(postulacion).data)
 
     @action(detail=True, methods=['get'])

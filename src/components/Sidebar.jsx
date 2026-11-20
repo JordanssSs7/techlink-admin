@@ -12,6 +12,9 @@ const ENLACES = [
   { ruta: '/mentorias', texto: 'Mentorías', icono: 'estrella' },
   { ruta: '/sesiones', texto: 'Sesiones', icono: 'reloj' },
   { ruta: '/metricas', texto: 'Métricas', icono: 'grafico' },
+  { ruta: '/reportes', texto: 'Reportes', icono: 'alerta' },
+  { ruta: '/moderacion', texto: 'Moderación', icono: 'escudo' },
+  { ruta: '/historial', texto: 'Historial', icono: 'lista' },
 ]
 
 function iniciales(usuario) {

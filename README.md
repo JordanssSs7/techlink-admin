@@ -3,7 +3,7 @@
 Panel de administración de TechLink: front-end en React + Vite y back-end en Django REST Framework.
 Django usa la **misma base de datos MySQL (`techlink`)** que el backend de usuario (Spring Boot).
 Todas las secciones consumen la API de Django: usuarios (con paginación), postulaciones, cursos, mentorías, sesiones y métricas.
-Las tablas de postulaciones, calificaciones y sesiones las crean las migraciones V6 a V8 del backend de usuario (Spring Boot).
+Las tablas de postulaciones, calificaciones, sesiones, reportes y acciones del administrador las crean las migraciones V6 a V9 del backend de usuario (Spring Boot).
 
 ## Ejecutar Django y React a la vez
 
@@ -39,7 +39,21 @@ Si alguien abre el panel directamente, `/login` también pide correo y contrase�
 (Spring Boot, `POST /api/auth/login`), por eso **Spring Boot debe estar encendido en el puerto 8080**. Solo las cuentas con rol `ADMIN` entran;
 estudiantes y mentores ingresan desde la aplicación de TechLink. En desarrollo, Vite reenvía `/spring` hacia `http://localhost:8080`
 (`vite.config.js`), así no hace falta CORS en Spring; en otro entorno se define `VITE_AUTH_URL`.
-El token se guarda en `sessionStorage` y Axios lo envía en cada petición (`Authorization: Bearer ...`). Django todavía **no lo valida** (RNF-02 pendiente).
+El token se guarda en `sessionStorage` y Axios lo envía en cada petición (`Authorization: Bearer ...`).
+
+### Seguridad de la API (RNF-02): `JWT_SECRET`
+
+Django valida el token que emite Spring Boot (HS256). Para eso **los dos backends deben tener la misma clave** en la variable de entorno `JWT_SECRET`
+(mínimo 32 caracteres), definida antes de encenderlos:
+
+```
+$env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
+```
+
+- Con `JWT_SECRET` en Django: toda la API exige un token válido de un usuario con rol `ADMIN` (401 sin token o con token vencido, 403 con otro rol).
+  Las acciones del panel quedan firmadas con el id del administrador (`id_revisor` de las postulaciones y el historial de acciones).
+- Sin `JWT_SECRET` en Django: la API queda abierta (modo desarrollo) y las acciones se anotan como "Sin identificar".
+- Si Spring no tiene `JWT_SECRET`, usa una clave al azar distinta en cada arranque y Django no podrá validar sus tokens (el panel responderá 401).
 
 ### Pantallas (una por opción del menú)
 
@@ -53,6 +67,9 @@ El token se guarda en `sessionStorage` y Axios lo envía en cada petición (`Aut
 | `/mentorias` | Mentorías por mentor |
 | `/sesiones` | Sesiones y cancelación |
 | `/metricas` | Métricas y exportación del reporte |
+| `/reportes` | Reportes de usuarios y sesiones: resolver o descartar con nota (HU-52) |
+| `/moderacion` | Calificaciones y comentarios: ocultar con motivo o mostrar (HU-53) |
+| `/historial` | Historial de acciones del administrador (HU-59) |
 
 Notas del backend:
 
@@ -88,15 +105,23 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Mentores con perfil y sesiones | `GET /api/mentores/` | 200 |
 | Indicadores y métricas (HU-47, HU-50) | `GET /api/metricas/resumen/` | 200 (incluye calificación promedio y distribución por estrellas) |
 | Exportar el reporte (HU-50) | `GET /api/metricas/exportar/?formato=xlsx` o `?formato=pdf` | 200 con el archivo, o 400 si el formato no existe |
+| Listar reportes (HU-52) | `GET /api/reportes/?estado=PENDIENTE&tipo=SESION&motivo=ACOSO&search=texto&page=1` | 200 con `{count, next, previous, results}` |
+| Contar reportes por estado | `GET /api/reportes/resumen/` | 200 con `{PENDIENTE, RESUELTO, DESCARTADO}` |
+| Resolver o descartar un reporte | `POST /api/reportes/{id}/resolver/` o `/descartar/` con `{"nota": "..."}` | 200, 400 sin nota, 409 si ya fue revisado |
+| Listar calificaciones (HU-53) | `GET /api/calificaciones/?oculto=true&estrellas=1&con_comentario=true&search=texto` | 200 con `{count, next, previous, results}` |
+| Ocultar una calificación | `POST /api/calificaciones/{id}/ocultar/` con `{"motivo": "..."}` | 200 (recalcula la reputación del mentor), 400 sin motivo, 409 si ya está oculta |
+| Mostrarla de nuevo | `POST /api/calificaciones/{id}/mostrar/` | 200, 409 si ya es visible |
+| Historial de acciones (HU-59) | `GET /api/historial/?tipo=SESION_CANCELADA&admin=1&desde=2026-11-01&hasta=2026-11-30&search=texto&page=1` | 200 con `{count, next, previous, results}`, o 400 si un filtro es inválido |
+| Tipos de acción del historial | `GET /api/historial/tipos/` | 200 |
 | Estado de la API | `GET /api/estado/` | 200 |
 
-Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8).
+Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9).
 Si esas migraciones todavía no se aplicaron en la base local, hay que arrancar una vez el backend de usuario (Spring Boot) para que Flyway las cree.
 
 Estados de una sesión: la tabla solo guarda `CONFIRMADA` o `CANCELADA`; el panel muestra además **Programada** y **Completada**, según la fecha y la hora de fin.
 Los correos de aviso salen por la consola de Django en desarrollo; para enviarlos de verdad se define `EMAIL_BACKEND` y los datos SMTP (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`).
 
-Pendiente: el motivo de una cancelación solo viaja en el correo, porque la tabla `sesiones` no tiene una columna para guardarlo (haría falta una migración V9 en el backend de usuario).
+Pendiente: el motivo de una cancelación solo viaja en el correo, porque la tabla `sesiones` no tiene una columna para guardarlo (haría falta una migración nueva en el backend de usuario).
 El campo `id_revisor` de una postulación queda vacío hasta que el panel tenga login.
 
 Campos de un curso: `id`, `nombre`, `activo`, `total_mentores` y `total_estudiantes` (los dos últimos son de solo lectura).
@@ -124,7 +149,9 @@ Este repositorio es el **panel de administración**.
 | Usuarios y roles | `usuarios` | `UsuariosPage` (`UsuarioLista`) | **Construido** con API real |
 | Postulaciones a mentor | `postulaciones` | `PostulacionesPage` | Interfaz con datos de prueba (Semanas 10–11) |
 | Mentorías y métricas | `mentorias` | `MentoriasPage`, `MetricasPage`, `ResumenPage` | **Construido** con API real (sesiones cuando exista la tabla) |
-| Autenticación del administrador | (pendiente) | `LoginPage` | Pendiente |
+| Moderación (reportes y calificaciones) | `moderacion` | `ReportesPage`, `ModeracionPage` | **Construido** con API real (HU-52 y HU-53) |
+| Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
+| Autenticación del administrador | `core` (`core/auth.py`) | `LoginPage` | **Construido**: Django valida el token de Spring con `JWT_SECRET` |
 
 ### Requisitos funcionales
 
@@ -142,7 +169,7 @@ Este repositorio es el **panel de administración**.
 | Código | Requisito | Criterio de aceptación |
 |---|---|---|
 | RNF-01 | Rendimiento | El listado de cursos responde en menos de 1 segundo con la base local (medido en la pestaña Network). |
-| RNF-02 | Seguridad | Toda la API del panel exige un token de administrador; sin token responde 401 (pendiente de implementar). |
+| RNF-02 | Seguridad | Toda la API del panel exige el token de un administrador; sin token responde 401 y con otro rol 403 (requiere `JWT_SECRET`, ver arriba). |
 | RNF-03 | Integridad | Django no crea ni altera tablas de la base compartida: los modelos usan `managed = False` y no se ejecuta `migrate`. |
 | RNF-04 | Usabilidad | Cada pantalla muestra los estados de carga, error y lista vacía; nunca queda en blanco. |
 

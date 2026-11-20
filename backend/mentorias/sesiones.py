@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from auditoria.registro import registrar
 from .metricas import ahora_local, estado_sesion, filtro_estado
 from .models import Sesion
 from .serializers import CancelacionSerializer, SesionSerializer
@@ -97,6 +98,8 @@ class SesionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.G
                 return Response({'detalle': 'No se puede cancelar una sesión que ya terminó.'}, status=status.HTTP_409_CONFLICT)
             sesion.estado = 'CANCELADA'
             sesion.save(update_fields=['estado'])
+            registrar(request, 'SESION_CANCELADA', 'sesion', sesion.id,
+                      f'Canceló la sesión #{sesion.id} ({sesion.fecha:%d/%m/%Y} {sesion.hora_inicio:%H:%M}): {motivo}')
         sesion = self.get_queryset().get(pk=pk)
         datos = self.get_serializer(sesion).data
         datos['correos_enviados'] = avisar_cancelacion(sesion, motivo)

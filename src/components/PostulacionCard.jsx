@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import api from '../api'
+import { abrirArchivo } from '../archivos'
 
 const ETIQUETAS = {
   EN_REVISION: { texto: 'En revisión', color: 'ambar' },
@@ -20,7 +20,16 @@ function PostulacionCard({ postulacion, onAprobar, onRechazar }) {
   const [enviando, setEnviando] = useState(false)
 
   const { texto, color } = ETIQUETAS[postulacion.estado]
-  const urlComprobante = `${api.defaults.baseURL}/postulaciones/${postulacion.id}/comprobante/`
+
+  // El comprobante se pide con el token del administrador y se abre en una pestaña nueva.
+  async function verComprobante() {
+    setError('')
+    try {
+      await abrirArchivo(`/postulaciones/${postulacion.id}/comprobante/`)
+    } catch {
+      setError('No se pudo abrir el comprobante.')
+    }
+  }
 
   async function aprobar() {
     if (!window.confirm(`¿Aprobar a ${postulacion.postulante}? Su cuenta pasará al rol Mentor.`)) return
@@ -57,9 +66,9 @@ function PostulacionCard({ postulacion, onAprobar, onRechazar }) {
       <p className="texto-suave">Enviada el {formatearFecha(postulacion.fecha_envio)}</p>
       {postulacion.comentario && <p className="comentario">“{postulacion.comentario}”</p>}
 
-      <a className="comprobante" href={urlComprobante} target="_blank" rel="noreferrer">
+      <button type="button" className="comprobante" onClick={verComprobante}>
         📎 {postulacion.nombre_archivo} ({Math.max(1, Math.round(postulacion.tamano_bytes / 1024))} KB)
-      </a>
+      </button>
 
       {postulacion.estado === 'RECHAZADA' && <p className="motivo">Motivo: {postulacion.motivo_revision}</p>}
       {postulacion.fecha_revision && postulacion.estado !== 'EN_REVISION' && (

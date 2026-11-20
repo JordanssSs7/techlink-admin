@@ -47,9 +47,11 @@ def resumen_sesiones():
         por_estado[estado_sesion(s, ahora)].append(s)
     confirmadas = por_estado['COMPLETADA'] + por_estado['PROGRAMADA']
 
-    resumen_cal = Calificacion.objects.aggregate(promedio=Avg('estrellas'), total=Count('id'))
+    # HU-53: las calificaciones ocultas por moderación no cuentan.
+    visibles = Calificacion.objects.filter(oculto=False)
+    resumen_cal = visibles.aggregate(promedio=Avg('estrellas'), total=Count('id'))
     por_estrellas = {n: 0 for n in range(1, 6)}
-    for fila in Calificacion.objects.values('estrellas').annotate(total=Count('id')):
+    for fila in visibles.values('estrellas').annotate(total=Count('id')):
         if fila['estrellas'] in por_estrellas:
             por_estrellas[fila['estrellas']] = fila['total']
 
