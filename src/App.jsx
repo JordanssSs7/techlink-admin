@@ -1,10 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RutaProtegida from './components/RutaProtegida'
 import CursosPage from './pages/CursosPage'
+import HistorialPage from './pages/HistorialPage'
 import LoginPage from './pages/LoginPage'
 import MentoriasPage from './pages/MentoriasPage'
 import MetricasPage from './pages/MetricasPage'
+import ModeracionPage from './pages/ModeracionPage'
 import PostulacionesPage from './pages/PostulacionesPage'
+import ReportesPage from './pages/ReportesPage'
 import ResumenPage from './pages/ResumenPage'
 import SesionesPage from './pages/SesionesPage'
 import UsuariosPage from './pages/UsuariosPage'
@@ -22,6 +25,9 @@ function App() {
         <Route path="mentorias" element={<MentoriasPage />} />
         <Route path="sesiones" element={<SesionesPage />} />
         <Route path="metricas" element={<MetricasPage />} />
+        <Route path="reportes" element={<ReportesPage />} />
+        <Route path="moderacion" element={<ModeracionPage />} />
+        <Route path="historial" element={<HistorialPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
