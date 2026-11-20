@@ -2,6 +2,8 @@ from django.db.models.expressions import RawSQL
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
+from auditoria.registro import registrar
+
 from .models import Curso
 from .serializers import CursoSerializer
 
@@ -28,6 +30,15 @@ class CursoViewSet(viewsets.ModelViewSet):
             total_estudiantes=RawSQL(ESTUDIANTES, []),
         )
 
+    def perform_create(self, serializer):
+        curso = serializer.save()
+        registrar(self.request, 'CURSO_CREADO', 'curso', curso.id, f'Creó el curso {curso.nombre}')
+
+    def perform_update(self, serializer):
+        curso = serializer.save()
+        estado = 'activo' if curso.activo else 'inactivo'
+        registrar(self.request, 'CURSO_ACTUALIZADO', 'curso', curso.id, f'Actualizó el curso {curso.nombre} (queda {estado})')
+
     def destroy(self, request, *args, **kwargs):
         curso = self.get_object()
         if curso.total_mentores or curso.total_estudiantes:
@@ -36,4 +47,5 @@ class CursoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         curso.delete()
+        registrar(request, 'CURSO_ELIMINADO', 'curso', curso.id, f'Eliminó el curso {curso.nombre}')
         return Response(status=status.HTTP_204_NO_CONTENT)

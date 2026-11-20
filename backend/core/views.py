@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-MODULOS = ['cursos', 'usuarios', 'postulaciones', 'mentorias']
+MODULOS = ['cursos', 'usuarios', 'postulaciones', 'mentorias', 'moderacion', 'auditoria']
 
 
 @api_view(['GET'])

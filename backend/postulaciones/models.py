@@ -19,7 +19,7 @@ class Postulacion(models.Model):
     comentario = models.CharField(max_length=500, null=True)
     fecha_envio = models.DateTimeField()
     fecha_revision = models.DateTimeField(null=True)
-    # Quién la evaluó: el panel todavía no tiene login, por eso por ahora queda vacío.
+    # Quién la evaluó: el id del administrador del token (queda vacío si la API corre sin JWT_SECRET).
     id_revisor = models.IntegerField(null=True)
     motivo_revision = models.CharField(max_length=500, null=True)
 
