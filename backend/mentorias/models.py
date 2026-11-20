@@ -35,6 +35,10 @@ class Calificacion(models.Model):
     estrellas = models.IntegerField()
     comentario = models.CharField(max_length=500, null=True)
     fecha_creacion = models.DateTimeField()
+    # HU-53 (V9): una calificación oculta por el administrador no se muestra ni cuenta para la reputación del mentor.
+    oculto = models.BooleanField(default=False)
+    fecha_moderacion = models.DateTimeField(null=True)
+    motivo_moderacion = models.CharField(max_length=300, null=True)
 
     class Meta:
         managed = False
