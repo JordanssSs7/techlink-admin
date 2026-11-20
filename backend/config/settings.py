@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'postulaciones',
     'mentorias',
     'moderacion',
+    'comunidad',
     'auditoria',
 ]
 
@@ -166,6 +167,8 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '') == '1'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'TechLink <no-responder@techlink.local>')
+# Correo de soporte que se menciona en los avisos a quienes tienen algo oculto (HU-54).
+CORREO_SOPORTE = os.environ.get('CORREO_SOPORTE', 'soporte@techlink.edu.pe')
 
 # El panel de React (Vite) corre en otro puerto durante el desarrollo.
 CORS_ALLOWED_ORIGINS = [

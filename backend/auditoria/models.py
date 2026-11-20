@@ -18,6 +18,12 @@ TIPOS = {
     'REPORTE_DESCARTADO': 'Reporte descartado',
     'CALIFICACION_OCULTADA': 'Calificación ocultada',
     'CALIFICACION_MOSTRADA': 'Calificación mostrada',
+    'CONSULTA_OCULTADO': 'Consulta del foro ocultada',
+    'CONSULTA_MOSTRADO': 'Consulta del foro mostrada',
+    'RESPUESTA_OCULTADO': 'Respuesta del foro ocultada',
+    'RESPUESTA_MOSTRADO': 'Respuesta del foro mostrada',
+    'RECURSO_OCULTADO': 'Recurso compartido ocultado',
+    'RECURSO_MOSTRADO': 'Recurso compartido mostrado',
 }
 
 

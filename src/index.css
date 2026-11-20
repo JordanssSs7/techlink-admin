@@ -456,3 +456,12 @@ button.comprobante:hover { text-decoration: underline; }
 .campo-check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--suave); }
 .campo-check input { width: auto; margin: 0; }
 .nota-revision { color: var(--suave); font-size: 13px; margin: 4px 0 0; overflow-wrap: anywhere; }
+
+/* Pestañas de "Foro y recursos" (HU-54) y vista previa de un recurso de código */
+.pestanas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pestanas button { padding: 8px 18px; font: inherit; font-size: 14px; font-weight: 600; color: var(--tinta); background: #fff; border: 1.5px solid var(--tinta); border-radius: 999px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.pestanas button:hover:not(.activa) { background: #f4f4f5; }
+.pestanas button.activa { color: #fff; background: var(--tinta); }
+.vista-codigo { margin: 6px 0 0; padding: 10px 12px; max-height: 140px; overflow: auto; font-size: 12px; line-height: 1.5; color: #fff; background: #0b0b0c; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.texto-tabla > strong, .texto-tabla > small { display: block; }
+.texto-tabla > p { margin: 4px 0 0; overflow-wrap: anywhere; }

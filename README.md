@@ -69,6 +69,7 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/metricas` | Métricas y exportación del reporte |
 | `/reportes` | Reportes de usuarios y sesiones: resolver o descartar con nota (HU-52) |
 | `/moderacion` | Calificaciones y comentarios: ocultar con motivo o mostrar (HU-53) |
+| `/foro` | Foro y recursos: ocultar con motivo (se avisa al autor) o mostrar consultas, respuestas y recursos (HU-54) |
 | `/historial` | Historial de acciones del administrador (HU-59) |
 
 Notas del backend:
@@ -111,11 +112,19 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Listar calificaciones (HU-53) | `GET /api/calificaciones/?oculto=true&estrellas=1&con_comentario=true&search=texto` | 200 con `{count, next, previous, results}` |
 | Ocultar una calificación | `POST /api/calificaciones/{id}/ocultar/` con `{"motivo": "..."}` | 200 (recalcula la reputación del mentor), 400 sin motivo, 409 si ya está oculta |
 | Mostrarla de nuevo | `POST /api/calificaciones/{id}/mostrar/` | 200, 409 si ya es visible |
+| Listar consultas del foro (HU-54) | `GET /api/foro/consultas/?oculto=true&curso=4&search=texto&page=1` | 200 con `{count, next, previous, results}` |
+| Listar respuestas del foro (HU-54) | `GET /api/foro/respuestas/?oculto=false&search=texto` | 200 con `{count, next, previous, results}` |
+| Listar recursos compartidos (HU-54) | `GET /api/recursos/?tipo=ARCHIVO&oculto=false&search=texto` | 200 con `{count, next, previous, results}` |
+| Ocultar una consulta, respuesta o recurso | `POST /api/foro/consultas/{id}/ocultar/`, `/api/foro/respuestas/{id}/ocultar/` o `/api/recursos/{id}/ocultar/` con `{"motivo": "..."}` | 200 con `autor_notificado` (si el correo al autor salió), 400 sin motivo, 409 si ya está oculto |
+| Mostrarlo de nuevo | `POST .../{id}/mostrar/` en cada una de las tres rutas | 200, 409 si ya es visible |
+| Ver el archivo de un recurso | `GET /api/recursos/{id}/archivo/` | 200 con el PDF o la imagen, 404 si el recurso no es un archivo |
 | Historial de acciones (HU-59) | `GET /api/historial/?tipo=SESION_CANCELADA&admin=1&desde=2026-11-01&hasta=2026-11-30&search=texto&page=1` | 200 con `{count, next, previous, results}`, o 400 si un filtro es inválido |
 | Tipos de acción del historial | `GET /api/historial/tipos/` | 200 |
 | Estado de la API | `GET /api/estado/` | 200 |
 
-Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9).
+Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10).
+
+Moderación del foro y los recursos (HU-54): ocultar no borra nada, solo marca `oculto = true` con el motivo y la fecha, y el backend de usuario deja de mostrarlo. Al ocultar se le envía el motivo al autor por correo (la dirección de soporte que se menciona se define con `CORREO_SOPORTE`); si el correo falla, el ocultamiento igual queda guardado y el panel avisa que no se pudo notificar.
 Si esas migraciones todavía no se aplicaron en la base local, hay que arrancar una vez el backend de usuario (Spring Boot) para que Flyway las cree.
 
 Estados de una sesión: la tabla solo guarda `CONFIRMADA` o `CANCELADA`; el panel muestra además **Programada** y **Completada**, según la fecha y la hora de fin.
@@ -150,6 +159,7 @@ Este repositorio es el **panel de administración**.
 | Postulaciones a mentor | `postulaciones` | `PostulacionesPage` | Interfaz con datos de prueba (Semanas 10–11) |
 | Mentorías y métricas | `mentorias` | `MentoriasPage`, `MetricasPage`, `ResumenPage` | **Construido** con API real (sesiones cuando exista la tabla) |
 | Moderación (reportes y calificaciones) | `moderacion` | `ReportesPage`, `ModeracionPage` | **Construido** con API real (HU-52 y HU-53) |
+| Foro y recursos (moderación) | `comunidad` | `ForoPage` | **Construido** con API real (HU-54) |
 | Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
 | Autenticación del administrador | `core` (`core/auth.py`) | `LoginPage` | **Construido**: Django valida el token de Spring con `JWT_SECRET` |
 
@@ -289,7 +299,7 @@ PanelCursos  (estado: cursos, cargando, error, busqueda, filtroActivo, cursoEdit
 
 ## Historias de usuario cubiertas
 
-Gestión de usuarios y roles, dashboard de KPI, evaluación de postulaciones, CRUD de cursos con borrado lógico y métricas de mentorías.
+Gestión de usuarios y roles, dashboard de KPI, evaluación de postulaciones, CRUD de cursos con borrado lógico y métricas de mentorías. Moderación de calificaciones (HU-53) y del foro y los recursos compartidos (HU-54).
 
 ## Pendiente
 
