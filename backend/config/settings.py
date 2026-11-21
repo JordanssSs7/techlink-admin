@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'mentorias',
     'moderacion',
     'comunidad',
+    'charlas',
     'auditoria',
 ]
 
