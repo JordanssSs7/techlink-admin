@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RutaProtegida from './components/RutaProtegida'
+import CharlasPage from './pages/CharlasPage'
 import CursosPage from './pages/CursosPage'
 import ForoPage from './pages/ForoPage'
 import HistorialPage from './pages/HistorialPage'
@@ -29,6 +30,7 @@ function App() {
         <Route path="reportes" element={<ReportesPage />} />
         <Route path="moderacion" element={<ModeracionPage />} />
         <Route path="foro" element={<ForoPage />} />
+        <Route path="charlas" element={<CharlasPage />} />
         <Route path="historial" element={<HistorialPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -10,5 +10,6 @@ urlpatterns = [
     path('api/', include('mentorias.urls')),
     path('api/', include('moderacion.urls')),
     path('api/', include('comunidad.urls')),
+    path('api/', include('charlas.urls')),
     path('api/', include('auditoria.urls')),
 ]

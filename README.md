@@ -3,7 +3,7 @@
 Panel de administración de TechLink: front-end en React + Vite y back-end en Django REST Framework.
 Django usa la **misma base de datos MySQL (`techlink`)** que el backend de usuario (Spring Boot).
 Todas las secciones consumen la API de Django: usuarios (con paginación), postulaciones, cursos, mentorías, sesiones y métricas.
-Las tablas de postulaciones, calificaciones, sesiones, reportes y acciones del administrador las crean las migraciones V6 a V9 del backend de usuario (Spring Boot).
+Las tablas de postulaciones, calificaciones, sesiones, reportes y acciones del administrador las crean las migraciones V6 a V11 del backend de usuario (Spring Boot).
 
 ## Ejecutar Django y React a la vez
 
@@ -69,6 +69,7 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/metricas` | Métricas y exportación del reporte |
 | `/reportes` | Reportes de usuarios y sesiones: resolver o descartar con nota (HU-52) |
 | `/moderacion` | Calificaciones y comentarios: ocultar con motivo o mostrar (HU-53) |
+| `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58) |
 | `/foro` | Foro y recursos: ocultar con motivo (se avisa al autor) o mostrar consultas, respuestas y recursos (HU-54) |
 | `/historial` | Historial de acciones del administrador (HU-59) |
 
@@ -112,6 +113,10 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Listar calificaciones (HU-53) | `GET /api/calificaciones/?oculto=true&estrellas=1&con_comentario=true&search=texto` | 200 con `{count, next, previous, results}` |
 | Ocultar una calificación | `POST /api/calificaciones/{id}/ocultar/` con `{"motivo": "..."}` | 200 (recalcula la reputación del mentor), 400 sin motivo, 409 si ya está oculta |
 | Mostrarla de nuevo | `POST /api/calificaciones/{id}/mostrar/` | 200, 409 si ya es visible |
+| Listar charlas (HU-58) | `GET /api/charlas/?estado=VIGENTE&desde=2026-11-01&hasta=2026-11-30&search=texto&page=1` | 200 con `{count, next, previous, results}` (cada charla trae `inscritos` y `estado`), o 400 si un filtro es inválido |
+| Crear una charla | `POST /api/charlas/` con `nombre`, `tematica`, `fecha`, `hora_inicio`, `hora_fin`, `enlace` (y `descripcion`, `curso`) | 201, o 400 si la fecha ya pasó, la hora de fin no es posterior al inicio o el enlace no es http/https |
+| Editar, desactivar o activar | `PATCH /api/charlas/{id}/`, `POST /api/charlas/{id}/desactivar/` o `/activar/` | 200, 409 si ya estaba en ese estado. Las charlas no se eliminan: se desactivan (y conservan sus inscripciones) |
+| Contar charlas por estado | `GET /api/charlas/resumen/` | 200 con `{vigentes, pasadas, inactivas}` |
 | Listar consultas del foro (HU-54) | `GET /api/foro/consultas/?oculto=true&curso=4&search=texto&page=1` | 200 con `{count, next, previous, results}` |
 | Listar respuestas del foro (HU-54) | `GET /api/foro/respuestas/?oculto=false&search=texto` | 200 con `{count, next, previous, results}` |
 | Listar recursos compartidos (HU-54) | `GET /api/recursos/?tipo=ARCHIVO&oculto=false&search=texto` | 200 con `{count, next, previous, results}` |
@@ -122,7 +127,7 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Tipos de acción del historial | `GET /api/historial/tipos/` | 200 |
 | Estado de la API | `GET /api/estado/` | 200 |
 
-Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10).
+Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10); las charlas y sus inscripciones, de `charlas` y `charla_inscripciones` (V11).
 
 Moderación del foro y los recursos (HU-54): ocultar no borra nada, solo marca `oculto = true` con el motivo y la fecha, y el backend de usuario deja de mostrarlo. Al ocultar se le envía el motivo al autor por correo (la dirección de soporte que se menciona se define con `CORREO_SOPORTE`); si el correo falla, el ocultamiento igual queda guardado y el panel avisa que no se pudo notificar.
 Si esas migraciones todavía no se aplicaron en la base local, hay que arrancar una vez el backend de usuario (Spring Boot) para que Flyway las cree.
@@ -160,6 +165,7 @@ Este repositorio es el **panel de administración**.
 | Mentorías y métricas | `mentorias` | `MentoriasPage`, `MetricasPage`, `ResumenPage` | **Construido** con API real (sesiones cuando exista la tabla) |
 | Moderación (reportes y calificaciones) | `moderacion` | `ReportesPage`, `ModeracionPage` | **Construido** con API real (HU-52 y HU-53) |
 | Foro y recursos (moderación) | `comunidad` | `ForoPage` | **Construido** con API real (HU-54) |
+| Charlas virtuales | `charlas` | `CharlasPage` | **Construido** con API real (HU-58) |
 | Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
 | Autenticación del administrador | `core` (`core/auth.py`) | `LoginPage` | **Construido**: Django valida el token de Spring con `JWT_SECRET` |
 

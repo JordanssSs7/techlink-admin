@@ -71,7 +71,7 @@ main {
   flex: none;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.25rem;
   width: var(--ancho-lateral);
   height: 100vh;
   padding: 1.75rem 1rem 1.25rem;
@@ -86,7 +86,17 @@ main {
 .logo:hover svg { transform: rotate(-10deg) scale(1.1); }
 .logo strong { display: block; font-size: 20px; letter-spacing: -0.02em; line-height: 1.1; }
 .logo small { display: block; font-size: 12px; color: rgb(255 255 255 / 55%); }
-.sidebar nav { display: flex; flex-direction: column; gap: 0.3rem; }
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  /* Con muchas opciones el menú se desplaza por dentro y la tarjeta del usuario queda siempre a la vista. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 25%) transparent;
+}
 .nav-titulo {
   padding: 0 0.75rem;
   margin-bottom: 0.4rem;
@@ -100,7 +110,7 @@ main {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 0.9rem;
+  padding: 0.6rem 0.9rem;
   font-size: 15px;
   font-weight: 500;
   text-decoration: none;
@@ -117,6 +127,7 @@ main {
 .sidebar a:focus-visible, .sidebar button:focus-visible { outline-color: #fff; }
 
 .sidebar-usuario {
+  flex: none;
   margin-top: auto;
   padding: 1rem;
   background: rgb(255 255 255 / 7%);
@@ -465,3 +476,12 @@ button.comprobante:hover { text-decoration: underline; }
 .vista-codigo { margin: 6px 0 0; padding: 10px 12px; max-height: 140px; overflow: auto; font-size: 12px; line-height: 1.5; color: #fff; background: #0b0b0c; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .texto-tabla > strong, .texto-tabla > small { display: block; }
 .texto-tabla > p { margin: 4px 0 0; overflow-wrap: anywhere; }
+
+/* Charlas virtuales (HU-58) */
+.form-charla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 16px; padding: 20px; margin: 4px 0 20px; background: var(--fondo); border-radius: 20px; }
+.form-charla-titulo { grid-column: 1 / -1; margin: 0; font-size: 16px; }
+.form-charla .campo-ancho { grid-column: 1 / -1; }
+.campo-form { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; }
+.campo-form input, .campo-form select, .campo-form textarea { width: 100%; margin: 0; box-sizing: border-box; font-weight: 400; }
+.campo-form textarea { resize: vertical; font-family: inherit; }
+@media (max-width: 760px) { .form-charla { grid-template-columns: 1fr; } }
