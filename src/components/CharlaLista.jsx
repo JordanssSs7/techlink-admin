@@ -55,10 +55,14 @@ function CharlaLista() {
     try {
       if (formulario?.id) {
         await api.patch(`/charlas/${formulario.id}/`, cuerpo)
-        setAviso({ texto: 'Charla actualizada.', tipo: 'ok' })
+        setAviso({ texto: 'Charla actualizada. Si cambió el horario o el enlace, se avisó a los inscritos.', tipo: 'ok' })
       } else {
-        await api.post('/charlas/', cuerpo)
-        setAviso({ texto: 'Charla creada. Ya se recomienda a los estudiantes que coinciden con su temática.', tipo: 'ok' })
+        const { data } = await api.post('/charlas/', cuerpo)
+        const avisados = data.avisados ?? 0
+        setAviso({
+          texto: `Charla creada. Se avisó a ${avisados} ${avisados === 1 ? 'estudiante' : 'estudiantes'} a quienes les interesa por su perfil.`,
+          tipo: 'ok',
+        })
       }
       setFormulario(null)
       refrescar()
@@ -71,7 +75,7 @@ function CharlaLista() {
   async function cambiarEstado(charla) {
     try {
       await api.post(`/charlas/${charla.id}/${charla.activo ? 'desactivar' : 'activar'}/`)
-      setAviso({ texto: charla.activo ? 'Charla desactivada.' : 'Charla activada.', tipo: 'ok' })
+      setAviso({ texto: charla.activo ? 'Charla desactivada. Se avisó a quienes ya se habían inscrito.' : 'Charla activada.', tipo: 'ok' })
       refrescar()
       return ''
     } catch (err) {

@@ -71,7 +71,7 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/moderacion` | Calificaciones y comentarios: ocultar con motivo o mostrar (HU-53) |
 | `/demanda` | Cursos en demanda: más solicitados y con más estudiantes en riesgo, por ciclo, con exportación a Excel (HU-55) |
 | `/emparejamiento` | Criterios de IA: pesos del emparejamiento con vista previa antes de guardar (HU-61) |
-| `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58) |
+| `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58). Al publicar una charla se avisa a los estudiantes a quienes les interesa, y a los inscritos si cambia de horario o enlace o se cancela (HU-24) |
 | `/ranking` | Ranking de mentores por horas y calificación, con filtros por curso y período (HU-56) |
 | `/anuncios` | Anuncios por rol: publicar y ver los ya publicados; llegan al centro de notificaciones (HU-57) |
 | `/foro` | Foro y recursos: ocultar con motivo (se avisa al autor) o mostrar consultas, respuestas y recursos (HU-54) |

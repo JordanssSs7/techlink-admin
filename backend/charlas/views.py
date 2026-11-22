@@ -11,6 +11,7 @@ from auditoria.registro import registrar
 from mentorias.metricas import ahora_local
 from mentorias.sesiones import fecha_o_error
 
+from . import avisos
 from .models import Charla
 from .serializers import CharlaSerializer
 
@@ -80,18 +81,29 @@ class CharlaViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retri
         serializador.is_valid(raise_exception=True)
         with transaction.atomic():
             charla = serializador.save()
+            avisados = avisos.avisar_nueva(charla)
             registrar(request, 'CHARLA_CREADA', 'charla', charla.id,
-                      f'Creó la charla "{charla.nombre}" ({charla.fecha:%d/%m/%Y} {charla.hora_inicio:%H:%M})')
-        return Response(self.get_serializer(self.get_queryset().get(pk=charla.id)).data, status=status.HTTP_201_CREATED)
+                      f'Creó la charla "{charla.nombre}" ({charla.fecha:%d/%m/%Y} {charla.hora_inicio:%H:%M}); '
+                      f'avisó a {avisados} estudiantes')
+        datos = self.get_serializer(self.get_queryset().get(pk=charla.id)).data
+        # Cuántos estudiantes recibieron el aviso de charla nueva en su centro de notificaciones.
+        datos['avisados'] = avisados
+        return Response(datos, status=status.HTTP_201_CREATED)
 
     def perform_update(self, serializer):
-        antes = serializer.instance.activo
-        charla = serializer.save()
-        if charla.activo != antes:
-            tipo, texto = ('CHARLA_ACTIVADA', 'Activó') if charla.activo else ('CHARLA_DESACTIVADA', 'Desactivó')
-        else:
-            tipo, texto = 'CHARLA_ACTUALIZADA', 'Actualizó'
-        registrar(self.request, tipo, 'charla', charla.id, f'{texto} la charla "{charla.nombre}"')
+        viejo = serializer.instance
+        activo_antes = viejo.activo
+        datos_antes = (viejo.fecha, viejo.hora_inicio, viejo.hora_fin, viejo.enlace)
+        with transaction.atomic():
+            charla = serializer.save()
+            if charla.activo != activo_antes:
+                tipo, texto = ('CHARLA_ACTIVADA', 'Activó') if charla.activo else ('CHARLA_DESACTIVADA', 'Desactivó')
+                avisados = avisos.avisar_estado(charla)
+            else:
+                tipo, texto = 'CHARLA_ACTUALIZADA', 'Actualizó'
+                avisados = avisos.avisar_cambio(charla, datos_antes)
+            detalle = f'{texto} la charla "{charla.nombre}"' + (f'; avisó a {avisados} inscritos' if avisados else '')
+            registrar(self.request, tipo, 'charla', charla.id, detalle)
 
     @action(detail=False, methods=['get'])
     def resumen(self, request):
@@ -110,8 +122,10 @@ class CharlaViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retri
                 return Response({'detalle': f'Esta charla {texto}.'}, status=status.HTTP_409_CONFLICT)
             charla.activo = activo
             charla.save(update_fields=['activo'])
+            avisados = avisos.avisar_estado(charla)
             registrar(request, 'CHARLA_ACTIVADA' if activo else 'CHARLA_DESACTIVADA', 'charla', charla.id,
-                      f'{"Activó" if activo else "Desactivó"} la charla "{charla.nombre}"')
+                      f'{"Activó" if activo else "Desactivó"} la charla "{charla.nombre}"'
+                      + (f'; avisó a {avisados} inscritos' if avisados else ''))
         return self._responder(pk)
 
     @action(detail=True, methods=['post'])
