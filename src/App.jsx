@@ -15,6 +15,7 @@ import PostulacionesPage from './pages/PostulacionesPage'
 import RankingPage from './pages/RankingPage'
 import ReportesPage from './pages/ReportesPage'
 import ResumenPage from './pages/ResumenPage'
+import SeguridadPage from './pages/SeguridadPage'
 import SesionesPage from './pages/SesionesPage'
 import UsuariosPage from './pages/UsuariosPage'
 
@@ -39,6 +40,7 @@ function App() {
         <Route path="emparejamiento" element={<EmparejamientoPage />} />
         <Route path="charlas" element={<CharlasPage />} />
         <Route path="anuncios" element={<AnunciosPage />} />
+        <Route path="seguridad" element={<SeguridadPage />} />
         <Route path="historial" element={<HistorialPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

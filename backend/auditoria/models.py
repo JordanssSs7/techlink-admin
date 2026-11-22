@@ -30,6 +30,7 @@ TIPOS = {
     'RECURSO_OCULTADO': 'Recurso compartido ocultado',
     'RECURSO_MOSTRADO': 'Recurso compartido mostrado',
     'ANUNCIO_PUBLICADO': 'Anuncio publicado',
+    'PARAMETROS_ACTUALIZADOS': 'Parámetros de seguridad actualizados',
 }
 
 

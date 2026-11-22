@@ -72,6 +72,7 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/demanda` | Cursos en demanda: más solicitados y con más estudiantes en riesgo, por ciclo, con exportación a Excel (HU-55) |
 | `/emparejamiento` | Criterios de IA: pesos del emparejamiento con vista previa antes de guardar (HU-61) |
 | `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58). Al publicar una charla se avisa a los estudiantes a quienes les interesa, y a los inscritos si cambia de horario o enlace o se cancela (HU-24) |
+| `/seguridad` | Parámetros de seguridad: dominio institucional, intentos máximos de login y minutos de bloqueo (HU-60) |
 | `/ranking` | Ranking de mentores por horas y calificación, con filtros por curso y período (HU-56) |
 | `/anuncios` | Anuncios por rol: publicar y ver los ya publicados; llegan al centro de notificaciones (HU-57) |
 | `/foro` | Foro y recursos: ocultar con motivo (se avisa al autor) o mostrar consultas, respuestas y recursos (HU-54) |
@@ -125,6 +126,9 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Crear una charla | `POST /api/charlas/` con `nombre`, `tematica`, `fecha`, `hora_inicio`, `hora_fin`, `enlace` (y `descripcion`, `curso`) | 201, o 400 si la fecha ya pasó, la hora de fin no es posterior al inicio o el enlace no es http/https |
 | Editar, desactivar o activar | `PATCH /api/charlas/{id}/`, `POST /api/charlas/{id}/desactivar/` o `/activar/` | 200, 409 si ya estaba en ese estado. Las charlas no se eliminan: se desactivan (y conservan sus inscripciones) |
 | Contar charlas por estado | `GET /api/charlas/resumen/` | 200 con `{vigentes, pasadas, inactivas}` |
+| Ver los parámetros de seguridad (HU-60) | `GET /api/parametros-seguridad/` | 200 con `dominio_permitido`, `max_intentos`, `minutos_bloqueo`, `actualizado_por`, `fecha_actualizacion`, `usuarios_fuera_del_dominio` y `limites` |
+| Cambiar los parámetros de seguridad | `PUT` o `PATCH /api/parametros-seguridad/` con `dominio_permitido` (sin @), `max_intentos` (1 a 10) y `minutos_bloqueo` (1 a 1440) | 200 con los valores nuevos y `sin_cambios`, o 400 con el error de cada campo. Rigen en los siguientes inicios de sesión (el backend de usuario los lee en cada intento) |
+| Avisar del efecto de un dominio | `GET /api/parametros-seguridad/impacto/?dominio=instituto.edu.pe` | 200 con `usuarios_afectados`: estudiantes y mentores activos que ya no podrían entrar con Google |
 | Ranking de mentores (HU-56) | `GET /api/mentores/ranking/?curso=4&desde=2026-09-01&hasta=2026-11-30&orden=horas&limite=20` | 200 con `{filtros, total_mentores, mentores}`: cada mentor trae `posicion`, `horas`, `sesiones`, `estudiantes_atendidos`, `promedio` y `calificaciones`. Solo cuentan las sesiones completadas y las calificaciones visibles; `orden` es `calificacion` (por defecto) u `horas`. 400 si un filtro es inválido |
 | Listar anuncios (HU-57) | `GET /api/anuncios/?rol_destino=MENTOR&search=texto&page=1` | 200 con `{count, next, previous, results}` (cada anuncio trae `destinatarios`) |
 | Publicar un anuncio | `POST /api/anuncios/` con `titulo`, `mensaje` y `rol_destino` (`ESTUDIANTE`, `MENTOR` o `TODOS`) | 201 con `destinatarios` (cuántos usuarios activos lo recibieron; quien desactivó los anuncios en sus preferencias no cuenta), o 400 si falta algo. No se edita ni se elimina |
@@ -139,7 +143,9 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Tipos de acción del historial | `GET /api/historial/tipos/` | 200 |
 | Estado de la API | `GET /api/estado/` | 200 |
 
-Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10); las charlas y sus inscripciones, de `charlas` y `charla_inscripciones` (V11); los anuncios, de `anuncios` y, al publicarlos, se insertan filas en `notificaciones` (V12, HU-57).
+Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10); las charlas y sus inscripciones, de `charlas` y `charla_inscripciones` (V11); los anuncios, de `anuncios` y, al publicarlos, se insertan filas en `notificaciones` (V12, HU-57); los parámetros de seguridad, de `parametros_seguridad` (V14, HU-60).
+
+Parámetros de seguridad (HU-60): una sola fila (id 1) que el backend de usuario lee en cada inicio de sesión, así que un cambio rige desde el siguiente intento sin reiniciar nada. El dominio solo afecta al login con Google de estudiantes y mentores; los administradores entran con contraseña de cualquier dominio, por lo que un dominio mal escrito no deja a nadie sin el panel.
 
 Anuncios (HU-57): al publicar, el panel inserta una notificación de tipo `ANUNCIO` por cada usuario activo del rol elegido; la ven en su centro de notificaciones (HU-22). Quien desactivó los anuncios en sus preferencias (HU-24) no la recibe. Los usuarios que se registren después no ven anuncios anteriores.
 
@@ -184,6 +190,7 @@ Este repositorio es el **panel de administración**.
 | Criterios de IA | — (los guarda Spring Boot) | `EmparejamientoPage` | **Construido** (HU-61): lee y guarda en Spring y lo anota en el historial |
 | Anuncios | `anuncios` | `AnunciosPage` | **Construido** con API real (HU-57) |
 | Ranking de mentores | `mentorias` | `RankingPage` | **Construido** con API real (HU-56) |
+| Parámetros de seguridad | `seguridad` | `SeguridadPage` | **Construido** con API real (HU-60) |
 | Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
 | Autenticación del administrador | `core` (`core/auth.py`) | `LoginPage` | **Construido**: Django valida el token de Spring con `JWT_SECRET` |
 

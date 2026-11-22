@@ -20,6 +20,7 @@ const ENLACES = [
   { ruta: '/emparejamiento', texto: 'Criterios de IA', icono: 'ajustes' },
   { ruta: '/charlas', texto: 'Charlas', icono: 'video' },
   { ruta: '/anuncios', texto: 'Anuncios', icono: 'megafono' },
+  { ruta: '/seguridad', texto: 'Seguridad', icono: 'candado' },
   { ruta: '/historial', texto: 'Historial', icono: 'lista' },
 ]
 
