@@ -15,6 +15,8 @@ const ENLACES = [
   { ruta: '/reportes', texto: 'Reportes', icono: 'alerta' },
   { ruta: '/moderacion', texto: 'Moderación', icono: 'escudo' },
   { ruta: '/foro', texto: 'Foro y recursos', icono: 'chat' },
+  { ruta: '/demanda', texto: 'Cursos en demanda', icono: 'grafico' },
+  { ruta: '/emparejamiento', texto: 'Criterios de IA', icono: 'ajustes' },
   { ruta: '/charlas', texto: 'Charlas', icono: 'video' },
   { ruta: '/historial', texto: 'Historial', icono: 'lista' },
 ]
