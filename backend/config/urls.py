@@ -13,5 +13,6 @@ urlpatterns = [
     path('api/', include('charlas.urls')),
     path('api/', include('anuncios.urls')),
     path('api/', include('seguridad.urls')),
+    path('api/', include('constancias.urls')),
     path('api/', include('auditoria.urls')),
 ]

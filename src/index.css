@@ -518,6 +518,9 @@ button.comprobante:hover { text-decoration: underline; }
 .criterios-guardar { margin-top: 18px; }
 @media (max-width: 900px) { .criterios, .vista-previa-doble { grid-template-columns: 1fr; } }
 
+/* Aviso numérico en el menú lateral (constancias por emitir, HU-27) */
+.insignia-menu { margin-left: auto; min-width: 22px; padding: 1px 7px; font-size: 12px; font-weight: 800; line-height: 20px; text-align: center; color: var(--tinta); background: #fff; border-radius: 999px; }
+
 /* Parámetros de seguridad (HU-60): aviso de lo que pasaría con un dominio nuevo */
 .aviso-peligro { padding: 12px 16px; background: #fff; border-radius: 14px; box-shadow: inset 0 0 0 1.5px var(--tinta); }
 .aviso-peligro p { margin: 0 0 8px; }

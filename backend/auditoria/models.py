@@ -31,6 +31,7 @@ TIPOS = {
     'RECURSO_MOSTRADO': 'Recurso compartido mostrado',
     'ANUNCIO_PUBLICADO': 'Anuncio publicado',
     'PARAMETROS_ACTUALIZADOS': 'Parámetros de seguridad actualizados',
+    'CONSTANCIA_EMITIDA': 'Constancia de mentoría emitida',
 }
 
 

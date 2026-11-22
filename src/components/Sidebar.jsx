@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/authContext'
 import { borrarSesion } from '../auth/sesion'
 import { URL_SALIDA } from '../config'
+import useApi from '../hooks/useApi'
 import Icono from './Icono'
 
 const ENLACES = [
@@ -20,6 +21,7 @@ const ENLACES = [
   { ruta: '/emparejamiento', texto: 'Criterios de IA', icono: 'ajustes' },
   { ruta: '/charlas', texto: 'Charlas', icono: 'video' },
   { ruta: '/anuncios', texto: 'Anuncios', icono: 'megafono' },
+  { ruta: '/constancias', texto: 'Constancias', icono: 'sello' },
   { ruta: '/seguridad', texto: 'Seguridad', icono: 'candado' },
   { ruta: '/historial', texto: 'Historial', icono: 'lista' },
 ]
@@ -37,6 +39,8 @@ function iniciales(usuario) {
 // Menú lateral: cada opción abre su propia pantalla. En pantallas pequeñas se abre y se cierra desde la barra superior.
 function Sidebar({ abierto, onCerrar }) {
   const { usuario } = useAuth()
+  // HU-27: constancias de mentores que ya cumplieron las horas y esperan que el administrador las emita.
+  const { datos: constancias } = useApi('/constancias/resumen/')
   const nombre = `${usuario.nombres} ${usuario.apellidos && usuario.apellidos !== '-' ? usuario.apellidos : ''}`.trim()
 
   // Cierra la sesión del panel y vuelve al inicio de sesión de la aplicación de usuario (que cierra la suya).
@@ -71,6 +75,11 @@ function Sidebar({ abierto, onCerrar }) {
           >
             <Icono nombre={e.icono} tam={18} />
             {e.texto}
+            {e.ruta === '/constancias' && constancias?.pendientes > 0 && (
+              <span className="insignia-menu" aria-label={`${constancias.pendientes} por emitir`}>
+                {constancias.pendientes}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import RutaProtegida from './components/RutaProtegida'
 import AnunciosPage from './pages/AnunciosPage'
 import CharlasPage from './pages/CharlasPage'
+import ConstanciasPage from './pages/ConstanciasPage'
 import CursosPage from './pages/CursosPage'
 import DemandaPage from './pages/DemandaPage'
 import EmparejamientoPage from './pages/EmparejamientoPage'
@@ -41,6 +42,7 @@ function App() {
         <Route path="charlas" element={<CharlasPage />} />
         <Route path="anuncios" element={<AnunciosPage />} />
         <Route path="seguridad" element={<SeguridadPage />} />
+        <Route path="constancias" element={<ConstanciasPage />} />
         <Route path="historial" element={<HistorialPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
