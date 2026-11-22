@@ -18,6 +18,7 @@ TIPOS = {
     'REPORTE_DESCARTADO': 'Reporte descartado',
     'CALIFICACION_OCULTADA': 'Calificación ocultada',
     'CALIFICACION_MOSTRADA': 'Calificación mostrada',
+    'CRITERIOS_IA_ACTUALIZADOS': 'Criterios de IA actualizados',
     'CHARLA_CREADA': 'Charla creada',
     'CHARLA_ACTUALIZADA': 'Charla actualizada',
     'CHARLA_DESACTIVADA': 'Charla desactivada',

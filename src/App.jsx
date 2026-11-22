@@ -3,6 +3,8 @@ import RutaProtegida from './components/RutaProtegida'
 import AnunciosPage from './pages/AnunciosPage'
 import CharlasPage from './pages/CharlasPage'
 import CursosPage from './pages/CursosPage'
+import DemandaPage from './pages/DemandaPage'
+import EmparejamientoPage from './pages/EmparejamientoPage'
 import ForoPage from './pages/ForoPage'
 import HistorialPage from './pages/HistorialPage'
 import LoginPage from './pages/LoginPage'
@@ -33,6 +35,8 @@ function App() {
         <Route path="reportes" element={<ReportesPage />} />
         <Route path="moderacion" element={<ModeracionPage />} />
         <Route path="foro" element={<ForoPage />} />
+        <Route path="demanda" element={<DemandaPage />} />
+        <Route path="emparejamiento" element={<EmparejamientoPage />} />
         <Route path="charlas" element={<CharlasPage />} />
         <Route path="anuncios" element={<AnunciosPage />} />
         <Route path="historial" element={<HistorialPage />} />

@@ -3,7 +3,7 @@
 Panel de administración de TechLink: front-end en React + Vite y back-end en Django REST Framework.
 Django usa la **misma base de datos MySQL (`techlink`)** que el backend de usuario (Spring Boot).
 Todas las secciones consumen la API de Django: usuarios (con paginación), postulaciones, cursos, mentorías, sesiones y métricas.
-Las tablas de postulaciones, calificaciones, sesiones, reportes y acciones del administrador las crean las migraciones V6 a V11 del backend de usuario (Spring Boot).
+Las tablas de postulaciones, calificaciones, sesiones, reportes y acciones del administrador las crean las migraciones V6 a V13 del backend de usuario (Spring Boot).
 
 ## Ejecutar Django y React a la vez
 
@@ -69,6 +69,8 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/metricas` | Métricas y exportación del reporte |
 | `/reportes` | Reportes de usuarios y sesiones: resolver o descartar con nota (HU-52) |
 | `/moderacion` | Calificaciones y comentarios: ocultar con motivo o mostrar (HU-53) |
+| `/demanda` | Cursos en demanda: más solicitados y con más estudiantes en riesgo, por ciclo, con exportación a Excel (HU-55) |
+| `/emparejamiento` | Criterios de IA: pesos del emparejamiento con vista previa antes de guardar (HU-61) |
 | `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58) |
 | `/ranking` | Ranking de mentores por horas y calificación, con filtros por curso y período (HU-56) |
 | `/anuncios` | Anuncios por rol: publicar y ver los ya publicados; llegan al centro de notificaciones (HU-57) |
@@ -115,6 +117,10 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Listar calificaciones (HU-53) | `GET /api/calificaciones/?oculto=true&estrellas=1&con_comentario=true&search=texto` | 200 con `{count, next, previous, results}` |
 | Ocultar una calificación | `POST /api/calificaciones/{id}/ocultar/` con `{"motivo": "..."}` | 200 (recalcula la reputación del mentor), 400 sin motivo, 409 si ya está oculta |
 | Mostrarla de nuevo | `POST /api/calificaciones/{id}/mostrar/` | 200, 409 si ya es visible |
+| Ranking de cursos (HU-55) | `GET /api/cursos/demanda/?ciclo=3&limite=10` | 200 con `{ciclo, ciclos, solicitados, en_riesgo}` (sesiones por curso y estudiantes que lo marcaron como crítico, con la prioridad de sumar mentores), o 400 si el ciclo o el límite son inválidos |
+| Exportar el ranking (HU-55) | `GET /api/cursos/demanda/exportar/?ciclo=3&limite=10` | 200 con un Excel de dos hojas |
+| Criterios de IA (HU-61, **Spring Boot**) | `GET` y `PUT /api/admin/emparejamiento/criterios` con `{cursos, calificacion, disponibilidad}` (0 a 100 cada uno) | 200, o 400 si un peso sale de rango o los tres son 0. Solo ADMIN; el panel lo pide por `/spring` con el token de Spring |
+| Vista previa de criterios (HU-61, **Spring Boot**) | `POST /api/admin/emparejamiento/vista-previa` con `{cursos: [ids], pesos?, horarios?}` | 200 con los 3 mentores que saldrían con esos pesos, sin guardar nada |
 | Listar charlas (HU-58) | `GET /api/charlas/?estado=VIGENTE&desde=2026-11-01&hasta=2026-11-30&search=texto&page=1` | 200 con `{count, next, previous, results}` (cada charla trae `inscritos` y `estado`), o 400 si un filtro es inválido |
 | Crear una charla | `POST /api/charlas/` con `nombre`, `tematica`, `fecha`, `hora_inicio`, `hora_fin`, `enlace` (y `descripcion`, `curso`) | 201, o 400 si la fecha ya pasó, la hora de fin no es posterior al inicio o el enlace no es http/https |
 | Editar, desactivar o activar | `PATCH /api/charlas/{id}/`, `POST /api/charlas/{id}/desactivar/` o `/activar/` | 200, 409 si ya estaba en ese estado. Las charlas no se eliminan: se desactivan (y conservan sus inscripciones) |
@@ -174,6 +180,8 @@ Este repositorio es el **panel de administración**.
 | Moderación (reportes y calificaciones) | `moderacion` | `ReportesPage`, `ModeracionPage` | **Construido** con API real (HU-52 y HU-53) |
 | Foro y recursos (moderación) | `comunidad` | `ForoPage` | **Construido** con API real (HU-54) |
 | Charlas virtuales | `charlas` | `CharlasPage` | **Construido** con API real (HU-58) |
+| Cursos en demanda | `cursos` (`demanda.py`) | `DemandaPage` | **Construido** con API real (HU-55) |
+| Criterios de IA | — (los guarda Spring Boot) | `EmparejamientoPage` | **Construido** (HU-61): lee y guarda en Spring y lo anota en el historial |
 | Anuncios | `anuncios` | `AnunciosPage` | **Construido** con API real (HU-57) |
 | Ranking de mentores | `mentorias` | `RankingPage` | **Construido** con API real (HU-56) |
 | Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
