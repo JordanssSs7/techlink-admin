@@ -70,6 +70,7 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/reportes` | Reportes de usuarios y sesiones: resolver o descartar con nota (HU-52) |
 | `/moderacion` | Calificaciones y comentarios: ocultar con motivo o mostrar (HU-53) |
 | `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58) |
+| `/ranking` | Ranking de mentores por horas y calificación, con filtros por curso y período (HU-56) |
 | `/anuncios` | Anuncios por rol: publicar y ver los ya publicados; llegan al centro de notificaciones (HU-57) |
 | `/foro` | Foro y recursos: ocultar con motivo (se avisa al autor) o mostrar consultas, respuestas y recursos (HU-54) |
 | `/historial` | Historial de acciones del administrador (HU-59) |
@@ -118,6 +119,7 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Crear una charla | `POST /api/charlas/` con `nombre`, `tematica`, `fecha`, `hora_inicio`, `hora_fin`, `enlace` (y `descripcion`, `curso`) | 201, o 400 si la fecha ya pasó, la hora de fin no es posterior al inicio o el enlace no es http/https |
 | Editar, desactivar o activar | `PATCH /api/charlas/{id}/`, `POST /api/charlas/{id}/desactivar/` o `/activar/` | 200, 409 si ya estaba en ese estado. Las charlas no se eliminan: se desactivan (y conservan sus inscripciones) |
 | Contar charlas por estado | `GET /api/charlas/resumen/` | 200 con `{vigentes, pasadas, inactivas}` |
+| Ranking de mentores (HU-56) | `GET /api/mentores/ranking/?curso=4&desde=2026-09-01&hasta=2026-11-30&orden=horas&limite=20` | 200 con `{filtros, total_mentores, mentores}`: cada mentor trae `posicion`, `horas`, `sesiones`, `estudiantes_atendidos`, `promedio` y `calificaciones`. Solo cuentan las sesiones completadas y las calificaciones visibles; `orden` es `calificacion` (por defecto) u `horas`. 400 si un filtro es inválido |
 | Listar anuncios (HU-57) | `GET /api/anuncios/?rol_destino=MENTOR&search=texto&page=1` | 200 con `{count, next, previous, results}` (cada anuncio trae `destinatarios`) |
 | Publicar un anuncio | `POST /api/anuncios/` con `titulo`, `mensaje` y `rol_destino` (`ESTUDIANTE`, `MENTOR` o `TODOS`) | 201 con `destinatarios` (cuántos usuarios activos lo recibieron; quien desactivó los anuncios en sus preferencias no cuenta), o 400 si falta algo. No se edita ni se elimina |
 | Ver a cuántos llegaría | `GET /api/anuncios/alcance/` | 200 con `{ESTUDIANTE, MENTOR, TODOS}` |
@@ -173,6 +175,7 @@ Este repositorio es el **panel de administración**.
 | Foro y recursos (moderación) | `comunidad` | `ForoPage` | **Construido** con API real (HU-54) |
 | Charlas virtuales | `charlas` | `CharlasPage` | **Construido** con API real (HU-58) |
 | Anuncios | `anuncios` | `AnunciosPage` | **Construido** con API real (HU-57) |
+| Ranking de mentores | `mentorias` | `RankingPage` | **Construido** con API real (HU-56) |
 | Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
 | Autenticación del administrador | `core` (`core/auth.py`) | `LoginPage` | **Construido**: Django valida el token de Spring con `JWT_SECRET` |
 

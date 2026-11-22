@@ -10,6 +10,7 @@ const ENLACES = [
   { ruta: '/postulaciones', texto: 'Postulaciones', icono: 'archivo' },
   { ruta: '/cursos', texto: 'Cursos', icono: 'libro' },
   { ruta: '/mentorias', texto: 'Mentorías', icono: 'estrella' },
+  { ruta: '/ranking', texto: 'Ranking', icono: 'trofeo' },
   { ruta: '/sesiones', texto: 'Sesiones', icono: 'reloj' },
   { ruta: '/metricas', texto: 'Métricas', icono: 'grafico' },
   { ruta: '/reportes', texto: 'Reportes', icono: 'alerta' },

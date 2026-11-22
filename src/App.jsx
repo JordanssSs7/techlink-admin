@@ -10,6 +10,7 @@ import MentoriasPage from './pages/MentoriasPage'
 import MetricasPage from './pages/MetricasPage'
 import ModeracionPage from './pages/ModeracionPage'
 import PostulacionesPage from './pages/PostulacionesPage'
+import RankingPage from './pages/RankingPage'
 import ReportesPage from './pages/ReportesPage'
 import ResumenPage from './pages/ResumenPage'
 import SesionesPage from './pages/SesionesPage'
@@ -28,6 +29,7 @@ function App() {
         <Route path="mentorias" element={<MentoriasPage />} />
         <Route path="sesiones" element={<SesionesPage />} />
         <Route path="metricas" element={<MetricasPage />} />
+        <Route path="ranking" element={<RankingPage />} />
         <Route path="reportes" element={<ReportesPage />} />
         <Route path="moderacion" element={<ModeracionPage />} />
         <Route path="foro" element={<ForoPage />} />
