@@ -10,7 +10,7 @@ from usuarios.models import Usuario
 
 
 class Reporte(models.Model):
-    TIPOS = [('USUARIO', 'Usuario'), ('SESION', 'Sesión')]
+    TIPOS = [('USUARIO', 'Usuario'), ('SESION', 'Sesión'), ('CONSULTA', 'Consulta del foro'), ('RESPUESTA', 'Respuesta del foro')]
     MOTIVOS = [
         ('CONDUCTA_INADECUADA', 'Conducta inadecuada'),
         ('ACOSO', 'Acoso'),
@@ -23,10 +23,15 @@ class Reporte(models.Model):
 
     id = models.AutoField(primary_key=True, db_column='id_reporte')
     reportante = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='id_reportante', related_name='+')
-    tipo = models.CharField(max_length=7, choices=TIPOS)
+    tipo = models.CharField(max_length=9, choices=TIPOS)
     reportado = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='id_usuario_reportado',
                                   related_name='reportes_recibidos')
     sesion = models.ForeignKey(Sesion, null=True, on_delete=models.CASCADE, db_column='id_sesion', related_name='+')
+    # Reportes del foro (V19): la consulta o la respuesta reportada y lo que decía al reportarla. Si su autor la edita o la
+    # elimina después, el texto guardado en contenido_reportado sigue mostrando qué se reportó.
+    id_consulta = models.IntegerField(null=True)
+    id_respuesta = models.IntegerField(null=True)
+    contenido_reportado = models.CharField(max_length=500, null=True)
     motivo = models.CharField(max_length=20, choices=MOTIVOS)
     descripcion = models.CharField(max_length=500)
     estado = models.CharField(max_length=10, choices=ESTADOS, default='PENDIENTE')

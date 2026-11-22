@@ -25,7 +25,7 @@ class ReporteSerializer(serializers.ModelSerializer):
         model = Reporte
         fields = ['id', 'tipo', 'motivo', 'motivo_texto', 'descripcion', 'estado', 'reportante', 'reportante_correo',
                   'reportado', 'reportado_correo', 'reportado_rol', 'sesion', 'reportes_contra_usuario',
-                  'fecha_creacion', 'fecha_revision', 'nota_revision']
+                  'id_consulta', 'id_respuesta', 'contenido_reportado', 'fecha_creacion', 'fecha_revision', 'nota_revision']
         read_only_fields = fields
 
     def get_reportante(self, r):

@@ -38,7 +38,7 @@ function ReporteFila({ reporte, onCerrar }) {
       <tr className={pendiente ? '' : 'fila-inactiva'}>
         <td>{formatearFechaHora(reporte.fecha_creacion)}</td>
         <td>
-          {reporte.tipo === 'SESION' ? 'Sesión' : 'Usuario'}
+          {{ SESION: 'Sesión', CONSULTA: 'Consulta del foro', RESPUESTA: 'Respuesta del foro' }[reporte.tipo] ?? 'Usuario'}
           <br />
           <small className="texto-suave">{reporte.motivo_texto}</small>
         </td>
@@ -67,6 +67,13 @@ function ReporteFila({ reporte, onCerrar }) {
           <td colSpan="6">
             <div className="detalle-reporte">
               <p className="descripcion">“{reporte.descripcion}”</p>
+              {reporte.contenido_reportado && (
+                <p className="texto-suave">
+                  <strong>Lo reportado decía:</strong> «{reporte.contenido_reportado}»
+                  <br />
+                  Para ocultarlo, ve a «Foro y recursos» (también se puede ocultar si su autor ya lo editó).
+                </p>
+              )}
               {reporte.sesion && (
                 <p className="texto-suave">
                   Sesión #{reporte.sesion.id}: {reporte.sesion.fecha.split('-').reverse().join('/')} de {reporte.sesion.hora_inicio} a{' '}
