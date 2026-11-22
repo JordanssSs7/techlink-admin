@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'moderacion',
     'comunidad',
     'charlas',
+    'anuncios',
     'auditoria',
 ]
 

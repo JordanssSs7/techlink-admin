@@ -72,6 +72,8 @@ $env:JWT_SECRET = "una-clave-de-por-lo-menos-32-caracteres-xxxx"
 | `/demanda` | Cursos en demanda: más solicitados y con más estudiantes en riesgo, por ciclo, con exportación a Excel (HU-55) |
 | `/emparejamiento` | Criterios de IA: pesos del emparejamiento con vista previa antes de guardar (HU-61) |
 | `/charlas` | Charlas virtuales: crear, editar y desactivar (HU-58) |
+| `/ranking` | Ranking de mentores por horas y calificación, con filtros por curso y período (HU-56) |
+| `/anuncios` | Anuncios por rol: publicar y ver los ya publicados; llegan al centro de notificaciones (HU-57) |
 | `/foro` | Foro y recursos: ocultar con motivo (se avisa al autor) o mostrar consultas, respuestas y recursos (HU-54) |
 | `/historial` | Historial de acciones del administrador (HU-59) |
 
@@ -123,6 +125,10 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Crear una charla | `POST /api/charlas/` con `nombre`, `tematica`, `fecha`, `hora_inicio`, `hora_fin`, `enlace` (y `descripcion`, `curso`) | 201, o 400 si la fecha ya pasó, la hora de fin no es posterior al inicio o el enlace no es http/https |
 | Editar, desactivar o activar | `PATCH /api/charlas/{id}/`, `POST /api/charlas/{id}/desactivar/` o `/activar/` | 200, 409 si ya estaba en ese estado. Las charlas no se eliminan: se desactivan (y conservan sus inscripciones) |
 | Contar charlas por estado | `GET /api/charlas/resumen/` | 200 con `{vigentes, pasadas, inactivas}` |
+| Ranking de mentores (HU-56) | `GET /api/mentores/ranking/?curso=4&desde=2026-09-01&hasta=2026-11-30&orden=horas&limite=20` | 200 con `{filtros, total_mentores, mentores}`: cada mentor trae `posicion`, `horas`, `sesiones`, `estudiantes_atendidos`, `promedio` y `calificaciones`. Solo cuentan las sesiones completadas y las calificaciones visibles; `orden` es `calificacion` (por defecto) u `horas`. 400 si un filtro es inválido |
+| Listar anuncios (HU-57) | `GET /api/anuncios/?rol_destino=MENTOR&search=texto&page=1` | 200 con `{count, next, previous, results}` (cada anuncio trae `destinatarios`) |
+| Publicar un anuncio | `POST /api/anuncios/` con `titulo`, `mensaje` y `rol_destino` (`ESTUDIANTE`, `MENTOR` o `TODOS`) | 201 con `destinatarios` (cuántos usuarios activos lo recibieron; quien desactivó los anuncios en sus preferencias no cuenta), o 400 si falta algo. No se edita ni se elimina |
+| Ver a cuántos llegaría | `GET /api/anuncios/alcance/` | 200 con `{ESTUDIANTE, MENTOR, TODOS}` |
 | Listar consultas del foro (HU-54) | `GET /api/foro/consultas/?oculto=true&curso=4&search=texto&page=1` | 200 con `{count, next, previous, results}` |
 | Listar respuestas del foro (HU-54) | `GET /api/foro/respuestas/?oculto=false&search=texto` | 200 con `{count, next, previous, results}` |
 | Listar recursos compartidos (HU-54) | `GET /api/recursos/?tipo=ARCHIVO&oculto=false&search=texto` | 200 con `{count, next, previous, results}` |
@@ -133,7 +139,9 @@ La dirección base está en `src/api.js` (`http://127.0.0.1:8000/api`, o la vari
 | Tipos de acción del historial | `GET /api/historial/tipos/` | 200 |
 | Estado de la API | `GET /api/estado/` | 200 |
 
-Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10); las charlas y sus inscripciones, de `charlas` y `charla_inscripciones` (V11).
+Las sesiones se leen de la tabla `sesiones` (V6 y V7) y las calificaciones de `calificaciones` (V7); las postulaciones, de `postulaciones` y `postulacion_archivos` (V8); los reportes, el historial de acciones y la moderación de calificaciones, de `reportes`, `acciones_admin` y `calificaciones.oculto` (V9); el foro y los recursos, de `consultas`, `respuestas`, `recursos` y `recurso_archivos` (V10); las charlas y sus inscripciones, de `charlas` y `charla_inscripciones` (V11); los anuncios, de `anuncios` y, al publicarlos, se insertan filas en `notificaciones` (V12, HU-57).
+
+Anuncios (HU-57): al publicar, el panel inserta una notificación de tipo `ANUNCIO` por cada usuario activo del rol elegido; la ven en su centro de notificaciones (HU-22). Quien desactivó los anuncios en sus preferencias (HU-24) no la recibe. Los usuarios que se registren después no ven anuncios anteriores.
 
 Moderación del foro y los recursos (HU-54): ocultar no borra nada, solo marca `oculto = true` con el motivo y la fecha, y el backend de usuario deja de mostrarlo. Al ocultar se le envía el motivo al autor por correo (la dirección de soporte que se menciona se define con `CORREO_SOPORTE`); si el correo falla, el ocultamiento igual queda guardado y el panel avisa que no se pudo notificar.
 Si esas migraciones todavía no se aplicaron en la base local, hay que arrancar una vez el backend de usuario (Spring Boot) para que Flyway las cree.
@@ -174,6 +182,8 @@ Este repositorio es el **panel de administración**.
 | Charlas virtuales | `charlas` | `CharlasPage` | **Construido** con API real (HU-58) |
 | Cursos en demanda | `cursos` (`demanda.py`) | `DemandaPage` | **Construido** con API real (HU-55) |
 | Criterios de IA | — (los guarda Spring Boot) | `EmparejamientoPage` | **Construido** (HU-61): lee y guarda en Spring y lo anota en el historial |
+| Anuncios | `anuncios` | `AnunciosPage` | **Construido** con API real (HU-57) |
+| Ranking de mentores | `mentorias` | `RankingPage` | **Construido** con API real (HU-56) |
 | Historial de acciones | `auditoria` | `HistorialPage` | **Construido** con API real (HU-59) |
 | Autenticación del administrador | `core` (`core/auth.py`) | `LoginPage` | **Construido**: Django valida el token de Spring con `JWT_SECRET` |
 
