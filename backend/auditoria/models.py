@@ -28,6 +28,7 @@ TIPOS = {
     'RESPUESTA_MOSTRADO': 'Respuesta del foro mostrada',
     'RECURSO_OCULTADO': 'Recurso compartido ocultado',
     'RECURSO_MOSTRADO': 'Recurso compartido mostrado',
+    'ANUNCIO_PUBLICADO': 'Anuncio publicado',
 }
 
 

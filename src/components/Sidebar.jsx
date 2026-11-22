@@ -16,6 +16,7 @@ const ENLACES = [
   { ruta: '/moderacion', texto: 'Moderación', icono: 'escudo' },
   { ruta: '/foro', texto: 'Foro y recursos', icono: 'chat' },
   { ruta: '/charlas', texto: 'Charlas', icono: 'video' },
+  { ruta: '/anuncios', texto: 'Anuncios', icono: 'megafono' },
   { ruta: '/historial', texto: 'Historial', icono: 'lista' },
 ]
 
