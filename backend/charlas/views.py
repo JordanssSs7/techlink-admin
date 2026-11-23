@@ -1,3 +1,6 @@
+import secrets
+
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.expressions import RawSQL
@@ -80,7 +83,10 @@ class CharlaViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retri
         serializador = self.get_serializer(data=request.data)
         serializador.is_valid(raise_exception=True)
         with transaction.atomic():
-            charla = serializador.save()
+            charla = serializador.save(token_invitado=secrets.token_urlsafe(24))
+            # La charla se hace en la sala de TechLink: el enlace se arma con su id.
+            charla.enlace = f'{settings.URL_PUBLICA}/sala/charla/{charla.id}'
+            charla.save(update_fields=['enlace'])
             avisados = avisos.avisar_nueva(charla)
             registrar(request, 'CHARLA_CREADA', 'charla', charla.id,
                       f'Creó la charla "{charla.nombre}" ({charla.fecha:%d/%m/%Y} {charla.hora_inicio:%H:%M}); '

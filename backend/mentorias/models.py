@@ -9,7 +9,7 @@ from usuarios.models import Estudiante, Mentor
 
 class Sesion(models.Model):
     # "Completada" no es un estado guardado: es una sesión CONFIRMADA cuya hora de fin ya pasó.
-    ESTADOS = [('CONFIRMADA', 'Confirmada'), ('CANCELADA', 'Cancelada')]
+    ESTADOS = [('PENDIENTE', 'Pendiente'), ('CONFIRMADA', 'Confirmada'), ('CANCELADA', 'Cancelada')]
 
     id = models.AutoField(primary_key=True, db_column='id_sesion')
     # Relaciones 1:N → un estudiante y un mentor pueden tener muchas sesiones.

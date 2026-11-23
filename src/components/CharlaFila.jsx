@@ -10,11 +10,23 @@ function formatearFecha(texto) {
   return texto.split('-').reverse().join('/')
 }
 
-// Una fila de la tabla de charlas (HU-58). Se puede editar, abrir el enlace y activar o desactivar.
+// Una fila de la tabla de charlas (HU-58). Se puede editar y activar o desactivar.
 // onCambiarEstado devuelve el texto de error si la API lo rechaza, o una cadena vacía si todo salió bien.
 function CharlaFila({ charla, onEditar, onCambiarEstado }) {
   const [error, setError] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [copiado, setCopiado] = useState(false)
+
+  // Copia el enlace secreto que el administrador le manda al invitado.
+  async function copiarEnlace() {
+    try {
+      await navigator.clipboard.writeText(charla.enlace_invitado ?? '')
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 2500)
+    } catch {
+      setError('No se pudo copiar. Copia este enlace a mano: ' + (charla.enlace_invitado ?? ''))
+    }
+  }
   const { texto, color } = ESTADOS[charla.estado]
 
   async function cambiar() {
@@ -53,12 +65,12 @@ function CharlaFila({ charla, onEditar, onCambiarEstado }) {
             <button className="btn btn-borde" onClick={() => onEditar(charla)}>
               Editar
             </button>
+            <button className="btn btn-borde" onClick={copiarEnlace} title="Enlace secreto para el invitado de la charla">
+              {copiado ? 'Enlace copiado' : 'Enlace del invitado'}
+            </button>
             <button className={charla.activo ? 'btn btn-peligro' : 'btn btn-ok'} onClick={cambiar} disabled={enviando}>
               {charla.activo ? 'Desactivar' : 'Activar'}
             </button>
-            <a className="btn btn-borde" href={charla.enlace} target="_blank" rel="noreferrer">
-              Enlace
-            </a>
           </div>
         </td>
       </tr>

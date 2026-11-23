@@ -20,7 +20,12 @@ class Charla(models.Model):
     fecha = models.DateField()
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
-    enlace = models.CharField(max_length=500)
+    # Enlace a la sala de TechLink de esta charla (/sala/charla/<id>): lo arma el sistema al crearla.
+    enlace = models.CharField(max_length=500, default='')
+    # Foto del invitado (migración V31): imagen reducida en base64 que se usa de fondo de la tarjeta de la charla.
+    imagen = models.TextField(null=True, blank=True)
+    # Enlace secreto del invitado (migración V30): con él entra a la sala sin cuenta. Solo lo ve el administrador.
+    token_invitado = models.CharField(max_length=64, null=True, blank=True)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(default=timezone.now)
 

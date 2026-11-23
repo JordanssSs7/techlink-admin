@@ -174,6 +174,9 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'TechLink <no-responde
 # Correo de soporte que se menciona en los avisos a quienes tienen algo oculto (HU-54).
 CORREO_SOPORTE = os.environ.get('CORREO_SOPORTE', 'soporte.techlink.app@gmail.com')
 
+# Dirección pública de la aplicación de estudiantes y mentores: con ella se arma el enlace de la sala de cada charla.
+URL_PUBLICA = os.environ.get('URL_PUBLICA', 'http://localhost:5173').rstrip('/')
+
 # El panel de React (Vite) corre en otro puerto durante el desarrollo.
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
