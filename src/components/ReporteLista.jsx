@@ -7,6 +7,7 @@ import Buscador from './Buscador'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
 import ReporteFila from './ReporteFila'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 10
 
@@ -64,17 +65,17 @@ function ReporteLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar por quien reporta o es reportado..." />
-        <select value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value)} aria-label="Filtrar por estado">
+        <Seleccion value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value)} aria-label="Filtrar por estado">
           <option value="PENDIENTE">{`Pendientes${cuenta('PENDIENTE')}`}</option>
           <option value="RESUELTO">{`Resueltos${cuenta('RESUELTO')}`}</option>
           <option value="DESCARTADO">{`Descartados${cuenta('DESCARTADO')}`}</option>
           <option value="">Todos</option>
-        </select>
-        <select value={tipo} onChange={(e) => cambiarFiltro(setTipo)(e.target.value)} aria-label="Filtrar por tipo">
+        </Seleccion>
+        <Seleccion value={tipo} onChange={(e) => cambiarFiltro(setTipo)(e.target.value)} aria-label="Filtrar por tipo">
           <option value="">Usuarios y sesiones</option>
           <option value="USUARIO">Reportes de usuarios</option>
           <option value="SESION">Reportes de sesiones</option>
-        </select>
+        </Seleccion>
         <span className="texto-suave">{cargando ? 'Cargando...' : `${total} ${total === 1 ? 'reporte' : 'reportes'}`}</span>
       </div>
 

@@ -5,6 +5,7 @@ import Buscador from './Buscador'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
 import UsuarioCard from './UsuarioCard'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 12
 
@@ -55,13 +56,13 @@ function UsuarioLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar por nombre o correo..." />
-        <select value={filtroRol} onChange={(e) => cambiarFiltro(setFiltroRol)(e.target.value)} aria-label="Filtrar por rol">
+        <Seleccion value={filtroRol} onChange={(e) => cambiarFiltro(setFiltroRol)(e.target.value)} aria-label="Filtrar por rol">
           <option value="">Todos los roles</option>
           <option value="ESTUDIANTE">Estudiantes</option>
           <option value="MENTOR">Mentores</option>
           <option value="ADMIN">Administradores</option>
-        </select>
-        <select
+        </Seleccion>
+        <Seleccion
           value={filtroEstado}
           onChange={(e) => cambiarFiltro(setFiltroEstado)(e.target.value)}
           aria-label="Filtrar por estado"
@@ -69,7 +70,7 @@ function UsuarioLista() {
           <option value="">Todos los estados</option>
           <option value="ACTIVO">Activos</option>
           <option value="INACTIVO">Inactivos</option>
-        </select>
+        </Seleccion>
         <span className="texto-suave">{cargando ? 'Cargando...' : `${total} usuarios`}</span>
       </div>
 

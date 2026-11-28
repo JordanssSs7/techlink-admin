@@ -7,6 +7,7 @@ import Buscador from './Buscador'
 import CalificacionFila from './CalificacionFila'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 10
 
@@ -68,19 +69,19 @@ function CalificacionLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar en comentarios, mentores o estudiantes..." />
-        <select value={visibilidad} onChange={(e) => cambiarFiltro(setVisibilidad)(e.target.value)} aria-label="Filtrar por visibilidad">
+        <Seleccion value={visibilidad} onChange={(e) => cambiarFiltro(setVisibilidad)(e.target.value)} aria-label="Filtrar por visibilidad">
           <option value="">Visibles y ocultas</option>
           <option value="false">Solo visibles</option>
           <option value="true">Solo ocultas</option>
-        </select>
-        <select value={estrellas} onChange={(e) => cambiarFiltro(setEstrellas)(e.target.value)} aria-label="Filtrar por estrellas">
+        </Seleccion>
+        <Seleccion value={estrellas} onChange={(e) => cambiarFiltro(setEstrellas)(e.target.value)} aria-label="Filtrar por estrellas">
           <option value="">Todas las estrellas</option>
           {[1, 2, 3, 4, 5].map((n) => (
             <option key={n} value={n}>
               {n} {n === 1 ? 'estrella' : 'estrellas'}
             </option>
           ))}
-        </select>
+        </Seleccion>
         <label className="campo-check">
           <input type="checkbox" checked={conComentario} onChange={(e) => cambiarFiltro(setConComentario)(e.target.checked)} />
           Solo con comentario

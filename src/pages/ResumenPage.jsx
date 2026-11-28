@@ -1,37 +1,46 @@
+import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/authContext'
 import useApi from '../hooks/useApi'
 import EncabezadoPagina from '../components/EncabezadoPagina'
-import EstadoCarga from '../components/EstadoCarga'
-import GraficoBarras from '../components/GraficoBarras'
-import KpiCard from '../components/KpiCard'
-import Tarjeta from '../components/Tarjeta'
+import Icono from '../components/Icono'
+import { GRUPOS } from '../menu'
 
-// Pantalla / — Dashboard con los KPI del servicio (GET /api/metricas/resumen/).
+// Pantalla / — Inicio del panel: un saludo, lo que está pendiente y accesos ordenados por tema (los datos numéricos están en Métricas).
 function ResumenPage() {
   const { usuario } = useAuth()
-  const { datos: resumen, cargando, error, recargar } = useApi('/metricas/resumen/')
-  const valor = (campo) => (resumen ? resumen[campo] : '—')
+  const { datos: constancias } = useApi('/constancias/resumen/')
   const primerNombre = (usuario.nombres || '').split(' ')[0]
+  const pendientes = constancias?.pendientes ?? 0
 
   return (
     <>
       <EncabezadoPagina
         etiqueta="Panel de administración"
         titulo={`Hola, ${primerNombre}.`}
-        intro="Así está TechLink hoy. Elige una opción del menú para gestionar usuarios, postulaciones, cursos y sesiones."
+        intro="Elige a dónde quieres ir. Las cifras y gráficos del servicio están en Métricas."
       />
 
-      <section className="kpis">
-        <KpiCard oscuro titulo="Estudiantes" valor={valor('estudiantes')} detalle="Cuentas de estudiantes" icono="usuarios" />
-        <KpiCard titulo="Mentores activos" valor={valor('mentores_activos')} detalle="Con cuenta activa" icono="estrella" />
-        <KpiCard titulo="Registros del mes" valor={valor('registros_ultimas_4_semanas')} detalle="Últimas 4 semanas" icono="grafico" />
-        <KpiCard titulo="Cursos activos" valor={valor('cursos_activos')} detalle="En el catálogo" icono="libro" />
-      </section>
+      {pendientes > 0 && (
+        <Link to="/constancias" className="inicio-aviso">
+          <span><strong>{pendientes} {pendientes === 1 ? 'constancia espera' : 'constancias esperan'}</strong> que las emitas</span>
+          <span aria-hidden="true">Ir a Constancias →</span>
+        </Link>
+      )}
 
-      <Tarjeta titulo="Crecimiento de registros" descripcion="Nuevos usuarios registrados por semana (lunes de cada semana).">
-        <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
-        {resumen && <GraficoBarras datos={resumen.registros_semanales} />}
-      </Tarjeta>
+      {GRUPOS.map((g, i) => (
+        <section key={g.id} className="inicio-grupo" style={{ '--i': i }} aria-label={g.titulo}>
+          <h2>{g.titulo}</h2>
+          <div className="inicio-rejilla">
+            {g.enlaces.map((e) => (
+              <Link key={e.ruta} to={e.ruta} className="inicio-acceso">
+                <span className="inicio-acceso-cab"><Icono nombre={e.icono} tam={18} />{e.texto}</span>
+                <p>{e.desc}</p>
+                <span className="inicio-flecha" aria-hidden="true">→</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
     </>
   )
 }

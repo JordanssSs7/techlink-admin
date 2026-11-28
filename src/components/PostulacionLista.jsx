@@ -5,6 +5,7 @@ import useApi from '../hooks/useApi'
 import Aviso from './Aviso'
 import EstadoCarga from './EstadoCarga'
 import PostulacionCard from './PostulacionCard'
+import Seleccion from './Seleccion'
 
 const FILTROS = [
   { valor: 'EN_REVISION', texto: 'En revisión' },
@@ -52,13 +53,13 @@ function PostulacionLista() {
   return (
     <>
       <div className="barra-filtros">
-        <select value={estado} onChange={(e) => setEstado(e.target.value)} aria-label="Filtrar por estado">
+        <Seleccion value={estado} onChange={(e) => setEstado(e.target.value)} aria-label="Filtrar por estado">
           {FILTROS.map((f) => (
             <option key={f.valor} value={f.valor}>
               {f.texto}
             </option>
           ))}
-        </select>
+        </Seleccion>
         <span className="texto-suave">{cargando ? 'Cargando...' : `${postulaciones.length} ${postulaciones.length === 1 ? 'postulación' : 'postulaciones'}`}</span>
       </div>
 

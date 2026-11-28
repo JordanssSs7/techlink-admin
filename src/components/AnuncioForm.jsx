@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Seleccion from './Seleccion'
 
 const MAX_TITULO = 150
 const MAX_MENSAJE = 500
@@ -49,13 +50,13 @@ function AnuncioForm({ alcance, onPublicar, onCancelar }) {
       </label>
       <label className="campo-form">
         Dirigido a
-        <select value={rolDestino} onChange={(e) => setRolDestino(e.target.value)}>
+        <Seleccion value={rolDestino} onChange={(e) => setRolDestino(e.target.value)}>
           {DESTINOS.map((d) => (
             <option key={d.valor} value={d.valor}>
               {d.texto}
             </option>
           ))}
-        </select>
+        </Seleccion>
       </label>
       <p className="texto-suave campo-ancho">
         {llegara === undefined ? '' : `Se enviará a ${llegara} ${llegara === 1 ? 'usuario activo' : 'usuarios activos'} y lo verán en su centro de notificaciones. No se puede editar ni borrar después de publicarlo.`}

@@ -8,6 +8,7 @@ import Aviso from './Aviso'
 import Buscador from './Buscador'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 10
 
@@ -62,12 +63,12 @@ function AnuncioLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar por título o mensaje..." />
-        <select value={rolDestino} onChange={(e) => cambiarFiltro(setRolDestino)(e.target.value)} aria-label="Filtrar por destino">
+        <Seleccion value={rolDestino} onChange={(e) => cambiarFiltro(setRolDestino)(e.target.value)} aria-label="Filtrar por destino">
           <option value="">Todos los destinos</option>
           <option value="ESTUDIANTE">Estudiantes</option>
           <option value="MENTOR">Mentores</option>
           <option value="TODOS">Estudiantes y mentores</option>
-        </select>
+        </Seleccion>
         <button className="btn btn-primario" onClick={() => setFormulario(true)} disabled={formulario}>
           Nuevo anuncio
         </button>

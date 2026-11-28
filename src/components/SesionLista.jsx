@@ -7,6 +7,7 @@ import Buscador from './Buscador'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
 import SesionFila from './SesionFila'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 10
 
@@ -69,12 +70,12 @@ function SesionLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar por mentor o estudiante..." />
-        <select value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value)} aria-label="Filtrar por estado">
+        <Seleccion value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value)} aria-label="Filtrar por estado">
           <option value="">Todos los estados</option>
           <option value="PROGRAMADA">Programadas</option>
           <option value="COMPLETADA">Completadas</option>
           <option value="CANCELADA">Canceladas</option>
-        </select>
+        </Seleccion>
         <label className="campo-fecha">
           Desde
           <input type="date" value={desde} max={hasta || undefined} onChange={(e) => cambiarFiltro(setDesde)(e.target.value)} />

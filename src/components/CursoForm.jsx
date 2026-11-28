@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Seleccion from './Seleccion'
 
 // Formulario de alta y de edición. Si recibe cursoEditando, se llena con sus datos
 // (el padre cambia la key para reiniciarlo). Las reglas del nombre las valida la API:
@@ -38,10 +39,10 @@ function CursoForm({ cursoEditando, errorServidor, onGuardar, onCancelar }) {
           maxLength={120}
           onChange={(e) => setNombre(e.target.value)}
         />
-        <select value={activo ? 'true' : 'false'} onChange={(e) => setActivo(e.target.value === 'true')} aria-label="Estado">
+        <Seleccion value={activo ? 'true' : 'false'} onChange={(e) => setActivo(e.target.value === 'true')} aria-label="Estado">
           <option value="true">Activo</option>
           <option value="false">Inactivo</option>
-        </select>
+        </Seleccion>
         <button type="submit" className="btn btn-primario" disabled={enviando}>
           {cursoEditando ? 'Guardar cambios' : 'Agregar curso'}
         </button>

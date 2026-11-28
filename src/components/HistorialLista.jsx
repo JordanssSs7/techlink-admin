@@ -4,6 +4,7 @@ import { formatearFechaHora } from '../formatos'
 import Buscador from './Buscador'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 15
 
@@ -38,14 +39,14 @@ function HistorialLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar en el detalle..." />
-        <select value={tipo} onChange={(e) => cambiarFiltro(setTipo)(e.target.value)} aria-label="Filtrar por tipo de acción">
+        <Seleccion value={tipo} onChange={(e) => cambiarFiltro(setTipo)(e.target.value)} aria-label="Filtrar por tipo de acción">
           <option value="">Todas las acciones</option>
           {(tipos ?? []).map((t) => (
             <option key={t.tipo} value={t.tipo}>
               {t.texto}
             </option>
           ))}
-        </select>
+        </Seleccion>
         <label className="campo-fecha">
           Desde
           <input type="date" value={desde} max={hasta || undefined} onChange={(e) => cambiarFiltro(setDesde)(e.target.value)} />

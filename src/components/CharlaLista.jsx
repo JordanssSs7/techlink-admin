@@ -8,6 +8,7 @@ import CharlaFila from './CharlaFila'
 import CharlaForm from './CharlaForm'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 10
 
@@ -91,12 +92,12 @@ function CharlaLista() {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder="Buscar por nombre o temática..." />
-        <select value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value)} aria-label="Filtrar por estado">
+        <Seleccion value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value)} aria-label="Filtrar por estado">
           <option value="">Todas</option>
           <option value="VIGENTE">{`Vigentes${cuenta('vigentes')}`}</option>
           <option value="PASADA">{`Pasadas${cuenta('pasadas')}`}</option>
           <option value="INACTIVA">{`Desactivadas${cuenta('inactivas')}`}</option>
-        </select>
+        </Seleccion>
         <label className="campo-fecha">
           Desde
           <input type="date" value={desde} max={hasta || undefined} onChange={(e) => cambiarFiltro(setDesde)(e.target.value)} />

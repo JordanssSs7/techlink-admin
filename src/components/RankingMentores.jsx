@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import useApi from '../hooks/useApi'
 import EstadoCarga from './EstadoCarga'
+import Seleccion from './Seleccion'
 
 const MEDALLAS = { 1: '🥇', 2: '🥈', 3: '🥉' }
 
@@ -65,24 +66,24 @@ function RankingMentores() {
   return (
     <>
       <div className="barra-filtros">
-        <select value={curso} onChange={(e) => setCurso(e.target.value)} aria-label="Filtrar por curso">
+        <Seleccion value={curso} onChange={(e) => setCurso(e.target.value)} aria-label="Filtrar por curso">
           <option value="">Todos los cursos</option>
           {(cursos ?? []).map((c) => (
             <option key={c.id} value={c.id}>
               {c.nombre}
             </option>
           ))}
-        </select>
-        <select value={orden} onChange={(e) => setOrden(e.target.value)} aria-label="Ordenar por">
+        </Seleccion>
+        <Seleccion value={orden} onChange={(e) => setOrden(e.target.value)} aria-label="Ordenar por">
           <option value="calificacion">Ordenar por calificación</option>
           <option value="horas">Ordenar por horas</option>
-        </select>
-        <select value={limite} onChange={(e) => setLimite(e.target.value)} aria-label="Cuántos mostrar">
+        </Seleccion>
+        <Seleccion value={limite} onChange={(e) => setLimite(e.target.value)} aria-label="Cuántos mostrar">
           <option value="10">Mostrar 10</option>
           <option value="20">Mostrar 20</option>
           <option value="50">Mostrar 50</option>
           <option value="100">Mostrar 100</option>
-        </select>
+        </Seleccion>
       </div>
 
       <div className="barra-filtros">

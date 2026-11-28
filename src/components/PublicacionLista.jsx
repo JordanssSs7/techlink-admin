@@ -7,6 +7,7 @@ import Buscador from './Buscador'
 import EstadoCarga from './EstadoCarga'
 import Paginacion from './Paginacion'
 import PublicacionFila from './PublicacionFila'
+import Seleccion from './Seleccion'
 
 const TAMANO_PAGINA = 10
 
@@ -79,18 +80,18 @@ function PublicacionLista({ tipo }) {
     <>
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={cambiarFiltro(setBusqueda)} placeholder={seccion.buscar} />
-        <select value={visibilidad} onChange={(e) => cambiarFiltro(setVisibilidad)(e.target.value)} aria-label="Filtrar por visibilidad">
+        <Seleccion value={visibilidad} onChange={(e) => cambiarFiltro(setVisibilidad)(e.target.value)} aria-label="Filtrar por visibilidad">
           <option value="">Visibles y ocultas</option>
           <option value="false">Solo visibles</option>
           <option value="true">Solo ocultas</option>
-        </select>
+        </Seleccion>
         {tipo === 'recursos' && (
-          <select value={tipoRecurso} onChange={(e) => cambiarFiltro(setTipoRecurso)(e.target.value)} aria-label="Filtrar por tipo de recurso">
+          <Seleccion value={tipoRecurso} onChange={(e) => cambiarFiltro(setTipoRecurso)(e.target.value)} aria-label="Filtrar por tipo de recurso">
             <option value="">Todos los tipos</option>
             <option value="ARCHIVO">Archivos</option>
             <option value="ENLACE">Enlaces</option>
             <option value="CODIGO">Código</option>
-          </select>
+          </Seleccion>
         )}
         <span className="texto-suave">{cargando ? 'Cargando...' : `${total} ${total === 1 ? seccion.singular : seccion.plural}`}</span>
       </div>

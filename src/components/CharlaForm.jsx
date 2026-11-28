@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Seleccion from './Seleccion'
 
 const MAX_NOMBRE = 150
 const MAX_TEMATICA = 60
@@ -100,14 +101,14 @@ function CharlaForm({ charlaEditando, cursos, onGuardar, onCancelar }) {
       </label>
       <label className="campo-form">
         Curso que refuerza (opcional)
-        <select value={curso} onChange={(e) => setCurso(e.target.value)}>
+        <Seleccion value={curso} onChange={(e) => setCurso(e.target.value)}>
           <option value="">Ninguno</option>
           {(cursos ?? []).map((cu) => (
             <option key={cu.id} value={cu.id}>
               {cu.nombre}
             </option>
           ))}
-        </select>
+        </Seleccion>
       </label>
       <label className="campo-form">
         Fecha

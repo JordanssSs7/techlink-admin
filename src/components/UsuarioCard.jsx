@@ -1,3 +1,5 @@
+import Seleccion from './Seleccion'
+
 const ROLES = { ESTUDIANTE: 'Estudiante', MENTOR: 'Mentor', ADMIN: 'Administrador' }
 
 function iniciales(usuario) {
@@ -29,13 +31,13 @@ function UsuarioCard({ usuario, error, onCambiarRol, onCambiarEstado }) {
 
       <label className="campo">
         Rol
-        <select value={usuario.rol} onChange={(e) => onCambiarRol(e.target.value)}>
+        <Seleccion value={usuario.rol} onChange={(e) => onCambiarRol(e.target.value)}>
           {Object.entries(ROLES).map(([valor, texto]) => (
             <option key={valor} value={valor}>
               {texto}
             </option>
           ))}
-        </select>
+        </Seleccion>
       </label>
 
       <div className="acciones">

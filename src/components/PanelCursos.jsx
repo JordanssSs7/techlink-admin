@@ -6,6 +6,7 @@ import Buscador from './Buscador'
 import CursoForm from './CursoForm'
 import CursoLista from './CursoLista'
 import CursoResumen from './CursoResumen'
+import Seleccion from './Seleccion'
 
 const porNombre = (a, b) => a.nombre.localeCompare(b.nombre, 'es')
 
@@ -152,11 +153,11 @@ function PanelCursos() {
 
       <div className="barra-filtros">
         <Buscador valor={busqueda} onCambiar={setBusqueda} placeholder="Buscar curso por nombre..." />
-        <select value={filtroActivo} onChange={(e) => setFiltroActivo(e.target.value)} aria-label="Filtrar por estado">
+        <Seleccion value={filtroActivo} onChange={(e) => setFiltroActivo(e.target.value)} aria-label="Filtrar por estado">
           <option value="">Todos los estados</option>
           <option value="true">Solo activos</option>
           <option value="false">Solo inactivos</option>
-        </select>
+        </Seleccion>
         <span className="texto-suave">{cargando ? 'Cargando...' : `${totalCursos} cursos`}</span>
       </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { descargarArchivo } from '../archivos'
 import useApi from '../hooks/useApi'
 import EstadoCarga from './EstadoCarga'
+import Seleccion from './Seleccion'
 
 const PRIORIDADES = {
   ALTA: { texto: 'Alta', color: 'rojo' },
@@ -52,17 +53,17 @@ function DemandaCursos() {
   return (
     <>
       <div className="barra-filtros">
-        <select value={ciclo} onChange={(e) => setCiclo(e.target.value)} aria-label="Filtrar por ciclo académico">
+        <Seleccion value={ciclo} onChange={(e) => setCiclo(e.target.value)} aria-label="Filtrar por ciclo académico">
           <option value="">Todos los ciclos</option>
           {(datos?.ciclos ?? []).map((c) => (
             <option key={c} value={c}>{`Ciclo ${c}`}</option>
           ))}
-        </select>
-        <select value={limite} onChange={(e) => setLimite(e.target.value)} aria-label="Cantidad de cursos">
+        </Seleccion>
+        <Seleccion value={limite} onChange={(e) => setLimite(e.target.value)} aria-label="Cantidad de cursos">
           {[5, 10, 20].map((n) => (
             <option key={n} value={n}>{`Top ${n}`}</option>
           ))}
-        </select>
+        </Seleccion>
         <button className="btn btn-primario" onClick={exportar} disabled={exportando || cargando || !!error}>
           {exportando ? 'Generando...' : 'Exportar a Excel'}
         </button>
